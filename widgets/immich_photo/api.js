@@ -3,12 +3,14 @@
 module.exports = {
 
   async getPhoto({ homey, query }) {
-    const mode = query.mode || 'random';
+    const { mode = 'random', deviceId } = query;
+
+    if (!deviceId) throw new Error('No device selected');
 
     const driver = homey.drivers.getDriver('immich');
     const devices = driver.getDevices();
-    if (!devices.length) throw new Error('No Immich device configured');
-    const device = devices[0];
+    const device = devices.find(d => d.getData().id === deviceId);
+    if (!device) throw new Error('Device not found');
 
     let assetInfo;
 

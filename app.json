@@ -1079,6 +1079,14 @@
       "height": 220,
       "settings": [
         {
+          "id": "device",
+          "type": "autocomplete",
+          "title": {
+            "en": "Device",
+            "nl": "Apparaat"
+          }
+        },
+        {
           "id": "mode",
           "type": "dropdown",
           "title": {

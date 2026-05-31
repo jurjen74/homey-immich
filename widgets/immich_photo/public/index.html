@@ -95,8 +95,19 @@
 
     async function loadPhoto() {
       const mode = settings.mode || 'random';
+      const deviceId = settings.device && settings.device.id;
+
+      if (!deviceId) {
+        showState('Select a device in widget settings');
+        return;
+      }
+
       try {
-        const photo = await Homey.api('GET', '/photo?mode=' + encodeURIComponent(mode), {});
+        const photo = await Homey.api(
+          'GET',
+          '/photo?mode=' + encodeURIComponent(mode) + '&deviceId=' + encodeURIComponent(deviceId),
+          {},
+        );
 
         photoEl.style.backgroundImage = "url('" + photo.src + "')";
         hideState();

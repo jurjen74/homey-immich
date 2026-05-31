@@ -2,13 +2,19 @@
 
 const Homey = require('homey');
 
-module.exports = class MyApp extends Homey.App {
+module.exports = class ImmichApp extends Homey.App {
 
-  /**
-   * onInit is called when the app is initialized.
-   */
   async onInit() {
-    this.log('MyApp has been initialized');
+    this.homey.widgets.getWidget('immich_photo')
+      .registerSettingAutocompleteListener('device', async (query) => {
+        const driver = this.homey.drivers.getDriver('immich');
+        const devices = driver.getDevices();
+        return devices
+          .filter(d => d.getName().toLowerCase().includes(query.toLowerCase()))
+          .map(d => ({ id: d.getData().id, name: d.getName() }));
+      });
+
+    this.log('ImmichApp initialized');
   }
 
 };
