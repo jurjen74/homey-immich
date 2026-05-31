@@ -9,13 +9,13 @@
       "name": "year",
       "type": "number",
       "title": { "en": "Year", "nl": "Jaar" },
-      "example": { "en": 2022, "nl": 2022 }
+      "example": 2022
     },
     {
       "name": "asset_count",
       "type": "number",
       "title": { "en": "Photos", "nl": "Foto's" },
-      "example": { "en": 5, "nl": 5 }
+      "example": 5
     }
   ],
   "args": [
