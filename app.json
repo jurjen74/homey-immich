@@ -32,6 +32,59 @@
     "triggers": [
       {
         "title": {
+          "en": "An album received a new asset",
+          "nl": "Een album ontving een nieuw bestand"
+        },
+        "titleFormatted": {
+          "en": "Album [[album]] received a new asset",
+          "nl": "Album [[album]] ontving een nieuw bestand"
+        },
+        "hint": {
+          "en": "Triggers when the number of assets in the selected album increases.",
+          "nl": "Activeert wanneer het aantal bestanden in het geselecteerde album toeneemt."
+        },
+        "tokens": [
+          {
+            "name": "album_name",
+            "type": "string",
+            "title": {
+              "en": "Album",
+              "nl": "Album"
+            },
+            "example": {
+              "en": "Vacation 2024",
+              "nl": "Vakantie 2024"
+            }
+          },
+          {
+            "name": "asset_count",
+            "type": "number",
+            "title": {
+              "en": "Total assets",
+              "nl": "Totaal bestanden"
+            },
+            "example": 42
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          },
+          {
+            "name": "album",
+            "type": "autocomplete",
+            "title": {
+              "en": "Album",
+              "nl": "Album"
+            }
+          }
+        ],
+        "id": "album_got_new_asset"
+      },
+      {
+        "title": {
           "en": "Free disk space dropped below a threshold",
           "nl": "Vrije schijfruimte daalde onder een drempelwaarde"
         },
@@ -152,6 +205,35 @@
           }
         ],
         "id": "new_asset"
+      },
+      {
+        "title": {
+          "en": "New duplicates were found",
+          "nl": "Nieuwe duplicaten gevonden"
+        },
+        "hint": {
+          "en": "Triggers when Immich detects more duplicate asset groups than the previous poll.",
+          "nl": "Activeert wanneer Immich meer dubbele bestanden detecteert dan bij de vorige controle."
+        },
+        "tokens": [
+          {
+            "name": "duplicate_count",
+            "type": "number",
+            "title": {
+              "en": "Duplicate groups",
+              "nl": "Duplicaatgroepen"
+            },
+            "example": 3
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          }
+        ],
+        "id": "new_duplicate"
       },
       {
         "title": {
@@ -542,6 +624,222 @@
       },
       {
         "title": {
+          "en": "Get a random photo",
+          "nl": "Willekeurige foto ophalen"
+        },
+        "titleFormatted": {
+          "en": "Get a random photo",
+          "nl": "Willekeurige foto ophalen"
+        },
+        "hint": {
+          "en": "Fetch a random asset from Immich. Use the output tokens in subsequent flow cards.",
+          "nl": "Haal een willekeurig bestand op uit Immich. Gebruik de outputtokens in volgende flowkaarten."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "asset_id",
+            "type": "string",
+            "title": {
+              "en": "Asset ID",
+              "nl": "Asset-ID"
+            },
+            "example": {
+              "en": "a1b2c3d4-0000-0000-0000-000000000000",
+              "nl": "a1b2c3d4-0000-0000-0000-000000000000"
+            }
+          },
+          {
+            "name": "type",
+            "type": "string",
+            "title": {
+              "en": "Type",
+              "nl": "Type"
+            },
+            "example": {
+              "en": "IMAGE",
+              "nl": "IMAGE"
+            }
+          },
+          {
+            "name": "filename",
+            "type": "string",
+            "title": {
+              "en": "Filename",
+              "nl": "Bestandsnaam"
+            },
+            "example": {
+              "en": "IMG_1234.jpg",
+              "nl": "IMG_1234.jpg"
+            }
+          },
+          {
+            "name": "taken_at",
+            "type": "string",
+            "title": {
+              "en": "Taken at",
+              "nl": "Gemaakt op"
+            },
+            "example": {
+              "en": "2024-06-01T12:00:00.000Z",
+              "nl": "2024-06-01T12:00:00.000Z"
+            }
+          },
+          {
+            "name": "thumb_url",
+            "type": "string",
+            "title": {
+              "en": "Thumbnail URL",
+              "nl": "Miniatuur-URL"
+            },
+            "example": {
+              "en": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail",
+              "nl": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail"
+            }
+          }
+        ],
+        "id": "random_photo"
+      },
+      {
+        "title": {
+          "en": "Remove an asset from an album",
+          "nl": "Asset uit een album verwijderen"
+        },
+        "titleFormatted": {
+          "en": "Remove asset [[asset_id]] from album [[album]]",
+          "nl": "Asset [[asset_id]] verwijderen uit album [[album]]"
+        },
+        "hint": {
+          "en": "Remove an asset from an Immich album. The asset itself is not deleted.",
+          "nl": "Verwijder een bestand uit een Immich-album. Het bestand zelf wordt niet verwijderd."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          },
+          {
+            "name": "album",
+            "type": "autocomplete",
+            "title": {
+              "en": "Album",
+              "nl": "Album"
+            }
+          },
+          {
+            "name": "asset_id",
+            "type": "text",
+            "title": {
+              "en": "Asset ID",
+              "nl": "Asset-ID"
+            },
+            "placeholder": {
+              "en": "a1b2c3d4-0000-0000-0000-000000000000",
+              "nl": "a1b2c3d4-0000-0000-0000-000000000000"
+            }
+          }
+        ],
+        "id": "remove_from_album"
+      },
+      {
+        "title": {
+          "en": "Set description on an asset",
+          "nl": "Beschrijving instellen op een asset"
+        },
+        "titleFormatted": {
+          "en": "Set description of asset [[asset_id]] to [[description]]",
+          "nl": "Beschrijving van asset [[asset_id]] instellen op [[description]]"
+        },
+        "hint": {
+          "en": "Set or update the description of an asset in Immich.",
+          "nl": "Stel de beschrijving van een bestand in Immich in of bij."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          },
+          {
+            "name": "asset_id",
+            "type": "text",
+            "title": {
+              "en": "Asset ID",
+              "nl": "Asset-ID"
+            },
+            "placeholder": {
+              "en": "a1b2c3d4-0000-0000-0000-000000000000",
+              "nl": "a1b2c3d4-0000-0000-0000-000000000000"
+            }
+          },
+          {
+            "name": "description",
+            "type": "text",
+            "title": {
+              "en": "Description",
+              "nl": "Beschrijving"
+            },
+            "placeholder": {
+              "en": "My description",
+              "nl": "Mijn beschrijving"
+            }
+          }
+        ],
+        "id": "set_description"
+      },
+      {
+        "title": {
+          "en": "Create a shared link for an album",
+          "nl": "Gedeelde link voor een album aanmaken"
+        },
+        "titleFormatted": {
+          "en": "Create a shared link for album [[album]]",
+          "nl": "Gedeelde link aanmaken voor album [[album]]"
+        },
+        "hint": {
+          "en": "Create a public shared link for an entire Immich album.",
+          "nl": "Maak een openbare gedeelde link aan voor een heel Immich-album."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          },
+          {
+            "name": "album",
+            "type": "autocomplete",
+            "title": {
+              "en": "Album",
+              "nl": "Album"
+            }
+          }
+        ],
+        "tokens": [
+          {
+            "name": "link_url",
+            "type": "string",
+            "title": {
+              "en": "Link URL",
+              "nl": "Link-URL"
+            },
+            "example": {
+              "en": "http://192.168.1.100:2283/share/abc123",
+              "nl": "http://192.168.1.100:2283/share/abc123"
+            }
+          }
+        ],
+        "id": "share_album"
+      },
+      {
+        "title": {
           "en": "Run Immich background job",
           "nl": "Immich-achtergrondtaak uitvoeren"
         },
@@ -616,6 +914,74 @@
           }
         ],
         "id": "trigger_job"
+      },
+      {
+        "title": {
+          "en": "Unarchive an asset",
+          "nl": "Asset uit archief halen"
+        },
+        "titleFormatted": {
+          "en": "Unarchive asset [[asset_id]]",
+          "nl": "Asset [[asset_id]] uit archief halen"
+        },
+        "hint": {
+          "en": "Restore an asset from the archive in Immich.",
+          "nl": "Zet een bestand terug vanuit het archief in Immich."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          },
+          {
+            "name": "asset_id",
+            "type": "text",
+            "title": {
+              "en": "Asset ID",
+              "nl": "Asset-ID"
+            },
+            "placeholder": {
+              "en": "a1b2c3d4-0000-0000-0000-000000000000",
+              "nl": "a1b2c3d4-0000-0000-0000-000000000000"
+            }
+          }
+        ],
+        "id": "unarchive_asset"
+      },
+      {
+        "title": {
+          "en": "Unfavourite an asset",
+          "nl": "Favoriet verwijderen van asset"
+        },
+        "titleFormatted": {
+          "en": "Unfavourite asset [[asset_id]]",
+          "nl": "Favoriet verwijderen van asset [[asset_id]]"
+        },
+        "hint": {
+          "en": "Remove the favourite mark from an asset in Immich.",
+          "nl": "Verwijder de favorietmarkering van een bestand in Immich."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          },
+          {
+            "name": "asset_id",
+            "type": "text",
+            "title": {
+              "en": "Asset ID",
+              "nl": "Asset-ID"
+            },
+            "placeholder": {
+              "en": "a1b2c3d4-0000-0000-0000-000000000000",
+              "nl": "a1b2c3d4-0000-0000-0000-000000000000"
+            }
+          }
+        ],
+        "id": "unfavorite_asset"
       }
     ]
   },
@@ -637,7 +1003,9 @@
         "immich_storage_used",
         "immich_disk_free",
         "immich_person_count",
-        "immich_album_count"
+        "immich_album_count",
+        "immich_trash_count",
+        "immich_duplicate_count"
       ],
       "settings": [
         {
@@ -737,6 +1105,23 @@
       "icon": "/assets/capabilities/immich_disk_free.svg",
       "insights": true
     },
+    "immich_duplicate_count": {
+      "type": "number",
+      "title": {
+        "en": "Duplicates",
+        "nl": "Duplicaten"
+      },
+      "units": {
+        "en": "groups",
+        "nl": "groepen"
+      },
+      "decimals": 0,
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capabilities/immich_duplicate_count.svg",
+      "insights": true
+    },
     "immich_person_count": {
       "type": "number",
       "title": {
@@ -786,6 +1171,23 @@
       "setable": false,
       "uiComponent": "sensor",
       "icon": "/assets/capabilities/immich_storage_used.svg",
+      "insights": true
+    },
+    "immich_trash_count": {
+      "type": "number",
+      "title": {
+        "en": "Trash",
+        "nl": "Prullenbak"
+      },
+      "units": {
+        "en": "items",
+        "nl": "items"
+      },
+      "decimals": 0,
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capabilities/immich_trash_count.svg",
       "insights": true
     },
     "immich_video_count": {

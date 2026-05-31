@@ -10,10 +10,12 @@ class ImmichDevice extends Homey.Device {
     this._lastPolledAt = new Date(); // baseline — don't re-trigger for existing assets
     this._lastMemoryDate = null;     // checked on first poll
     this._prevDiskFreeGb = null;
+    this._prevDuplicateCount = null;
+    this._albumAssetCounts = {};
 
     for (const cap of [
       'immich_photo_count', 'immich_video_count', 'immich_storage_used', 'immich_disk_free',
-      'immich_person_count', 'immich_album_count',
+      'immich_person_count', 'immich_album_count', 'immich_trash_count', 'immich_duplicate_count',
     ]) {
       if (!this.hasCapability(cap)) await this.addCapability(cap);
     }
@@ -52,11 +54,13 @@ class ImmichDevice extends Homey.Device {
   }
 
   async _checkServerStats() {
-    const [statsResult, storageResult, peopleResult, albumsResult] = await Promise.allSettled([
+    const [statsResult, storageResult, peopleResult, albumsResult, duplicatesResult, trashResult] = await Promise.allSettled([
       this._api.getServerStatistics(),
       this._api.getServerStorage(),
       this._api.getPeople(),
       this._api.getAlbums(),
+      this._api.getDuplicates(),
+      this._api.getTrashCount(),
     ]);
 
     if (statsResult.status === 'fulfilled') {
@@ -93,8 +97,36 @@ class ImmichDevice extends Homey.Device {
     }
 
     if (albumsResult.status === 'fulfilled') {
-      const count = Array.isArray(albumsResult.value) ? albumsResult.value.length : 0;
-      await this.setCapabilityValue('immich_album_count', count);
+      const albums = Array.isArray(albumsResult.value) ? albumsResult.value : [];
+      await this.setCapabilityValue('immich_album_count', albums.length);
+
+      for (const album of albums) {
+        const prev = this._albumAssetCounts[album.id];
+        const curr = album.assetCount ?? 0;
+        if (prev !== undefined && curr > prev) {
+          this.driver.triggerAlbumGotNewAsset(
+            this,
+            { album_name: album.albumName ?? '', asset_count: curr },
+            { albumId: album.id },
+          ).catch(this.error.bind(this));
+        }
+        this._albumAssetCounts[album.id] = curr;
+      }
+    }
+
+    if (duplicatesResult.status === 'fulfilled') {
+      const count = Array.isArray(duplicatesResult.value) ? duplicatesResult.value.length : 0;
+      await this.setCapabilityValue('immich_duplicate_count', count);
+
+      if (this._prevDuplicateCount !== null && count > this._prevDuplicateCount) {
+        this.driver.triggerNewDuplicate(this, { duplicate_count: count })
+          .catch(this.error.bind(this));
+      }
+      this._prevDuplicateCount = count;
+    }
+
+    if (trashResult.status === 'fulfilled') {
+      await this.setCapabilityValue('immich_trash_count', trashResult.value ?? 0);
     }
   }
 
@@ -162,8 +194,45 @@ class ImmichDevice extends Homey.Device {
     return (result?.assets?.total ?? 0) > 0;
   }
 
+  async cmdHasUploadsInLastMinutes(minutes) {
+    const since = new Date(Date.now() - minutes * 60 * 1000);
+    const result = await this._api.searchAssets({ createdAfter: since, size: 1 });
+    return (result?.assets?.total ?? 0) > 0;
+  }
+
+  async cmdRandomPhoto() {
+    const assets = await this._api.getRandomAssets(1);
+    const asset = Array.isArray(assets) ? assets[0] : assets;
+    if (!asset?.id) throw new Error('No random asset found');
+    const baseUrl = this.getSetting('url').replace(/\/$/, '');
+    return {
+      asset_id: asset.id,
+      type: asset.type ?? 'IMAGE',
+      filename: asset.originalFileName ?? '',
+      taken_at: asset.fileCreatedAt ?? '',
+      thumb_url: `${baseUrl}/api/assets/${asset.id}/thumbnail`,
+    };
+  }
+
   async cmdAddToAlbum(albumId, assetId) {
     await this._api.addToAlbum(albumId, [assetId]);
+  }
+
+  async cmdRemoveFromAlbum(albumId, assetId) {
+    await this._api.removeFromAlbum(albumId, [assetId]);
+  }
+
+  async cmdCreateAlbum(albumName) {
+    const album = await this._api.createAlbum(albumName);
+    if (!album?.id) throw new Error('No album ID in response');
+    return { album_id: album.id };
+  }
+
+  async cmdShareAlbum(albumId) {
+    const link = await this._api.createAlbumSharedLink(albumId);
+    const key = link?.key;
+    if (!key) throw new Error('No share key in response');
+    return { link_url: `${this.getSetting('url').replace(/\/$/, '')}/share/${key}` };
   }
 
   async cmdCreateSharedLink(assetId) {
@@ -173,28 +242,28 @@ class ImmichDevice extends Homey.Device {
     return { link_url: `${this.getSetting('url').replace(/\/$/, '')}/share/${key}` };
   }
 
-  async cmdTriggerJob(jobId) {
-    await this._api.triggerJob(jobId);
-  }
-
   async cmdFavoriteAsset(assetId) {
     await this._api.updateAssets([assetId], { isFavorite: true });
+  }
+
+  async cmdUnfavoriteAsset(assetId) {
+    await this._api.updateAssets([assetId], { isFavorite: false });
   }
 
   async cmdArchiveAsset(assetId) {
     await this._api.updateAssets([assetId], { isArchived: true });
   }
 
-  async cmdCreateAlbum(albumName) {
-    const album = await this._api.createAlbum(albumName);
-    if (!album?.id) throw new Error('No album ID in response');
-    return { album_id: album.id };
+  async cmdUnarchiveAsset(assetId) {
+    await this._api.updateAssets([assetId], { isArchived: false });
   }
 
-  async cmdHasUploadsInLastMinutes(minutes) {
-    const since = new Date(Date.now() - minutes * 60 * 1000);
-    const result = await this._api.searchAssets({ createdAfter: since, size: 1 });
-    return (result?.assets?.total ?? 0) > 0;
+  async cmdSetDescription(assetId, description) {
+    await this._api.updateAsset(assetId, { description });
+  }
+
+  async cmdTriggerJob(jobId) {
+    await this._api.triggerJob(jobId);
   }
 
 }

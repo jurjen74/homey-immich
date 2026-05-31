@@ -1,0 +1,11 @@
+{
+  "type": "number",
+  "title": { "en": "Duplicates", "nl": "Duplicaten" },
+  "units": { "en": "groups", "nl": "groepen" },
+  "decimals": 0,
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/capabilities/immich_duplicate_count.svg",
+  "insights": true
+}

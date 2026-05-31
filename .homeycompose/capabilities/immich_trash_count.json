@@ -1,0 +1,11 @@
+{
+  "type": "number",
+  "title": { "en": "Trash", "nl": "Prullenbak" },
+  "units": { "en": "items", "nl": "items" },
+  "decimals": 0,
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/capabilities/immich_trash_count.svg",
+  "insights": true
+}

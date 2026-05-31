@@ -1,0 +1,43 @@
+{
+  "title": { "en": "Get a random photo", "nl": "Willekeurige foto ophalen" },
+  "titleFormatted": { "en": "Get a random photo", "nl": "Willekeurige foto ophalen" },
+  "hint": {
+    "en": "Fetch a random asset from Immich. Use the output tokens in subsequent flow cards.",
+    "nl": "Haal een willekeurig bestand op uit Immich. Gebruik de outputtokens in volgende flowkaarten."
+  },
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" }
+  ],
+  "tokens": [
+    {
+      "name": "asset_id",
+      "type": "string",
+      "title": { "en": "Asset ID", "nl": "Asset-ID" },
+      "example": { "en": "a1b2c3d4-0000-0000-0000-000000000000", "nl": "a1b2c3d4-0000-0000-0000-000000000000" }
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "title": { "en": "Type", "nl": "Type" },
+      "example": { "en": "IMAGE", "nl": "IMAGE" }
+    },
+    {
+      "name": "filename",
+      "type": "string",
+      "title": { "en": "Filename", "nl": "Bestandsnaam" },
+      "example": { "en": "IMG_1234.jpg", "nl": "IMG_1234.jpg" }
+    },
+    {
+      "name": "taken_at",
+      "type": "string",
+      "title": { "en": "Taken at", "nl": "Gemaakt op" },
+      "example": { "en": "2024-06-01T12:00:00.000Z", "nl": "2024-06-01T12:00:00.000Z" }
+    },
+    {
+      "name": "thumb_url",
+      "type": "string",
+      "title": { "en": "Thumbnail URL", "nl": "Miniatuur-URL" },
+      "example": { "en": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail", "nl": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail" }
+    }
+  ]
+}

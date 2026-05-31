@@ -1,0 +1,17 @@
+{
+  "title": { "en": "Unfavourite an asset", "nl": "Favoriet verwijderen van asset" },
+  "titleFormatted": { "en": "Unfavourite asset [[asset_id]]", "nl": "Favoriet verwijderen van asset [[asset_id]]" },
+  "hint": {
+    "en": "Remove the favourite mark from an asset in Immich.",
+    "nl": "Verwijder de favorietmarkering van een bestand in Immich."
+  },
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" },
+    {
+      "name": "asset_id",
+      "type": "text",
+      "title": { "en": "Asset ID", "nl": "Asset-ID" },
+      "placeholder": { "en": "a1b2c3d4-0000-0000-0000-000000000000", "nl": "a1b2c3d4-0000-0000-0000-000000000000" }
+    }
+  ]
+}

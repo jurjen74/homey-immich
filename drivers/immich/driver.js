@@ -34,9 +34,49 @@ class ImmichDriver extends Homey.Driver {
           .map(p => ({ id: p.id, name: p.name }));
       });
 
+    this._triggerAlbumGotNewAsset = this.homey.flow.getDeviceTriggerCard('album_got_new_asset');
+    this._triggerAlbumGotNewAsset
+      .registerRunListener(({ args, state }) => args.album.id === state.albumId);
+    this._triggerAlbumGotNewAsset
+      .getArgument('album')
+      .registerAutocompleteListener(async (query, args) => {
+        const api = args.device?._api;
+        if (!api) return [];
+        const albums = await api.getAlbums().catch(() => []);
+        return (Array.isArray(albums) ? albums : [])
+          .filter(a => (a.albumName ?? '').toLowerCase().includes(query.toLowerCase()))
+          .map(a => ({ id: a.id, name: a.albumName }));
+      });
+
+    this._triggerNewDuplicate = this.homey.flow.getDeviceTriggerCard('new_duplicate');
+
     const addToAlbumCard = this.homey.flow.getActionCard('add_to_album');
     addToAlbumCard.registerRunListener(({ device, args }) => device.cmdAddToAlbum(args.album.id, args.asset_id));
     addToAlbumCard.getArgument('album')
+      .registerAutocompleteListener(async (query, args) => {
+        const api = args.device?._api;
+        if (!api) return [];
+        const albums = await api.getAlbums().catch(() => []);
+        return (Array.isArray(albums) ? albums : [])
+          .filter(a => (a.albumName ?? '').toLowerCase().includes(query.toLowerCase()))
+          .map(a => ({ id: a.id, name: a.albumName }));
+      });
+
+    const removeFromAlbumCard = this.homey.flow.getActionCard('remove_from_album');
+    removeFromAlbumCard.registerRunListener(({ device, args }) => device.cmdRemoveFromAlbum(args.album.id, args.asset_id));
+    removeFromAlbumCard.getArgument('album')
+      .registerAutocompleteListener(async (query, args) => {
+        const api = args.device?._api;
+        if (!api) return [];
+        const albums = await api.getAlbums().catch(() => []);
+        return (Array.isArray(albums) ? albums : [])
+          .filter(a => (a.albumName ?? '').toLowerCase().includes(query.toLowerCase()))
+          .map(a => ({ id: a.id, name: a.albumName }));
+      });
+
+    const shareAlbumCard = this.homey.flow.getActionCard('share_album');
+    shareAlbumCard.registerRunListener(({ device, args }) => device.cmdShareAlbum(args.album.id));
+    shareAlbumCard.getArgument('album')
       .registerAutocompleteListener(async (query, args) => {
         const api = args.device?._api;
         if (!api) return [];
@@ -52,20 +92,32 @@ class ImmichDriver extends Homey.Driver {
     this.homey.flow.getConditionCard('uploads_in_last_x_minutes')
       .registerRunListener(({ device, args }) => device.cmdHasUploadsInLastMinutes(args.minutes));
 
+    this.homey.flow.getActionCard('random_photo')
+      .registerRunListener(({ device }) => device.cmdRandomPhoto());
+
     this.homey.flow.getActionCard('create_shared_link')
       .registerRunListener(({ device, args }) => device.cmdCreateSharedLink(args.asset_id));
 
-    this.homey.flow.getActionCard('trigger_job')
-      .registerRunListener(({ device, args }) => device.cmdTriggerJob(args.job));
+    this.homey.flow.getActionCard('create_album')
+      .registerRunListener(({ device, args }) => device.cmdCreateAlbum(args.album_name));
 
     this.homey.flow.getActionCard('favorite_asset')
       .registerRunListener(({ device, args }) => device.cmdFavoriteAsset(args.asset_id));
 
+    this.homey.flow.getActionCard('unfavorite_asset')
+      .registerRunListener(({ device, args }) => device.cmdUnfavoriteAsset(args.asset_id));
+
     this.homey.flow.getActionCard('archive_asset')
       .registerRunListener(({ device, args }) => device.cmdArchiveAsset(args.asset_id));
 
-    const createAlbumCard = this.homey.flow.getActionCard('create_album');
-    createAlbumCard.registerRunListener(({ device, args }) => device.cmdCreateAlbum(args.album_name));
+    this.homey.flow.getActionCard('unarchive_asset')
+      .registerRunListener(({ device, args }) => device.cmdUnarchiveAsset(args.asset_id));
+
+    this.homey.flow.getActionCard('set_description')
+      .registerRunListener(({ device, args }) => device.cmdSetDescription(args.asset_id, args.description));
+
+    this.homey.flow.getActionCard('trigger_job')
+      .registerRunListener(({ device, args }) => device.cmdTriggerJob(args.job));
   }
 
   triggerNewAsset(device, tokens) {
@@ -78,6 +130,14 @@ class ImmichDriver extends Homey.Driver {
 
   triggerPersonInNewPhoto(device, tokens, state) {
     return this._triggerPersonInNewPhoto.trigger(device, tokens, state);
+  }
+
+  triggerAlbumGotNewAsset(device, tokens, state) {
+    return this._triggerAlbumGotNewAsset.trigger(device, tokens, state);
+  }
+
+  triggerNewDuplicate(device, tokens) {
+    return this._triggerNewDuplicate.trigger(device, tokens, {});
   }
 
   triggerDiskSpaceLow(device, tokens, state) {

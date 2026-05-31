@@ -1,0 +1,23 @@
+{
+  "title": { "en": "Set description on an asset", "nl": "Beschrijving instellen op een asset" },
+  "titleFormatted": { "en": "Set description of asset [[asset_id]] to [[description]]", "nl": "Beschrijving van asset [[asset_id]] instellen op [[description]]" },
+  "hint": {
+    "en": "Set or update the description of an asset in Immich.",
+    "nl": "Stel de beschrijving van een bestand in Immich in of bij."
+  },
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" },
+    {
+      "name": "asset_id",
+      "type": "text",
+      "title": { "en": "Asset ID", "nl": "Asset-ID" },
+      "placeholder": { "en": "a1b2c3d4-0000-0000-0000-000000000000", "nl": "a1b2c3d4-0000-0000-0000-000000000000" }
+    },
+    {
+      "name": "description",
+      "type": "text",
+      "title": { "en": "Description", "nl": "Beschrijving" },
+      "placeholder": { "en": "My description", "nl": "Mijn beschrijving" }
+    }
+  ]
+}
