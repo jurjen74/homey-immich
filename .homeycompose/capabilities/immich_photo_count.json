@@ -1,0 +1,11 @@
+{
+  "type": "number",
+  "title": { "en": "Photos", "nl": "Foto's" },
+  "units": { "en": "photos", "nl": "foto's" },
+  "decimals": 0,
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/capabilities/immich_photo_count.svg",
+  "insights": true
+}

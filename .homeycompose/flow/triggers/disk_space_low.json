@@ -1,0 +1,32 @@
+{
+  "title": {
+    "en": "Free disk space dropped below a threshold",
+    "nl": "Vrije schijfruimte daalde onder een drempelwaarde"
+  },
+  "titleFormatted": {
+    "en": "Free disk space dropped below [[threshold]] GB",
+    "nl": "Vrije schijfruimte daalde onder [[threshold]] GB"
+  },
+  "hint": {
+    "en": "Triggers once when free disk space crosses below the threshold. Resets when space rises back above it.",
+    "nl": "Activeert eenmalig wanneer de vrije schijfruimte onder de drempelwaarde daalt. Reset wanneer de ruimte er weer boven komt."
+  },
+  "tokens": [
+    {
+      "name": "disk_free_gb",
+      "type": "number",
+      "title": { "en": "Free space (GB)", "nl": "Vrije ruimte (GB)" },
+      "example": 12.5
+    }
+  ],
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" },
+    {
+      "name": "threshold",
+      "type": "number",
+      "title": { "en": "Threshold (GB)", "nl": "Drempelwaarde (GB)" },
+      "min": 0,
+      "step": 1
+    }
+  ]
+}

@@ -9,6 +9,17 @@ class ImmichDriver extends Homey.Driver {
     this._triggerNewAsset = this.homey.flow.getDeviceTriggerCard('new_asset');
     this._triggerNewMemory = this.homey.flow.getDeviceTriggerCard('new_memory');
 
+    this._triggerDiskSpaceLow = this.homey.flow.getDeviceTriggerCard('disk_space_low');
+    this._triggerDiskSpaceLow
+      .registerRunListener(({ args, state }) =>
+        state.diskFreeGb < args.threshold && state.prevDiskFreeGb >= args.threshold,
+      );
+
+    this.homey.flow.getConditionCard('disk_space_below')
+      .registerRunListener(({ device, args }) =>
+        device.getCapabilityValue('immich_disk_free') < args.threshold,
+      );
+
     this._triggerPersonInNewPhoto = this.homey.flow.getDeviceTriggerCard('person_in_new_photo');
     this._triggerPersonInNewPhoto
       .registerRunListener(({ args, state }) => args.person.id === state.personId);
@@ -55,6 +66,10 @@ class ImmichDriver extends Homey.Driver {
 
   triggerPersonInNewPhoto(device, tokens, state) {
     return this._triggerPersonInNewPhoto.trigger(device, tokens, state);
+  }
+
+  triggerDiskSpaceLow(device, tokens, state) {
+    return this._triggerDiskSpaceLow.trigger(device, tokens, state);
   }
 
   async onPair(session) {

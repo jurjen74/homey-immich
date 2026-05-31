@@ -9,6 +9,11 @@ class ImmichDevice extends Homey.Device {
     this._api = new ImmichApi(this.getSettings());
     this._lastPolledAt = new Date(); // baseline — don't re-trigger for existing assets
     this._lastMemoryDate = null;     // checked on first poll
+    this._prevDiskFreeGb = null;
+
+    for (const cap of ['immich_photo_count', 'immich_video_count', 'immich_storage_used', 'immich_disk_free']) {
+      if (!this.hasCapability(cap)) await this.addCapability(cap);
+    }
 
     this._startPolling();
     this.log(`${this.getName()} initialized`);
@@ -30,13 +35,51 @@ class ImmichDevice extends Homey.Device {
   async _poll() {
     const pollStart = new Date();
     try {
-      await this._checkNewAssets();
-      await this._checkMemories();
+      await Promise.all([
+        this._checkNewAssets(),
+        this._checkMemories(),
+        this._checkServerStats(),
+      ]);
       this._lastPolledAt = pollStart;
       if (!this.getAvailable()) await this.setAvailable();
     } catch (err) {
       this.error('Poll failed:', err.message);
       await this.setUnavailable(err.message);
+    }
+  }
+
+  async _checkServerStats() {
+    const [statsResult, storageResult] = await Promise.allSettled([
+      this._api.getServerStatistics(),
+      this._api.getServerStorage(),
+    ]);
+
+    if (statsResult.status === 'fulfilled') {
+      const s = statsResult.value;
+      await Promise.all([
+        this.setCapabilityValue('immich_photo_count', s?.photos ?? 0),
+        this.setCapabilityValue('immich_video_count', s?.videos ?? 0),
+        this.setCapabilityValue('immich_storage_used', parseFloat(((s?.usage ?? 0) / 1e9).toFixed(1))),
+      ]);
+    } else {
+      this.log('Server statistics unavailable (non-admin key?):', storageResult.reason?.message);
+    }
+
+    if (storageResult.status === 'fulfilled') {
+      const stor = storageResult.value;
+      const diskFreeGb = parseFloat(((stor?.diskAvailableRaw ?? 0) / 1e9).toFixed(1));
+      await this.setCapabilityValue('immich_disk_free', diskFreeGb);
+
+      if (this._prevDiskFreeGb !== null) {
+        this.driver.triggerDiskSpaceLow(
+          this,
+          { disk_free_gb: diskFreeGb },
+          { diskFreeGb, prevDiskFreeGb: this._prevDiskFreeGb },
+        ).catch(this.error.bind(this));
+      }
+      this._prevDiskFreeGb = diskFreeGb;
+    } else {
+      this.log('Server storage unavailable:', storageResult.reason?.message);
     }
   }
 

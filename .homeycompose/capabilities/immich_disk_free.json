@@ -1,0 +1,11 @@
+{
+  "type": "number",
+  "title": { "en": "Free Disk Space", "nl": "Vrije schijfruimte" },
+  "units": { "en": "GB", "nl": "GB" },
+  "decimals": 1,
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/capabilities/immich_disk_free.svg",
+  "insights": true
+}

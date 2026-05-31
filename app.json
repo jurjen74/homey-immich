@@ -32,6 +32,49 @@
     "triggers": [
       {
         "title": {
+          "en": "Free disk space dropped below a threshold",
+          "nl": "Vrije schijfruimte daalde onder een drempelwaarde"
+        },
+        "titleFormatted": {
+          "en": "Free disk space dropped below [[threshold]] GB",
+          "nl": "Vrije schijfruimte daalde onder [[threshold]] GB"
+        },
+        "hint": {
+          "en": "Triggers once when free disk space crosses below the threshold. Resets when space rises back above it.",
+          "nl": "Activeert eenmalig wanneer de vrije schijfruimte onder de drempelwaarde daalt. Reset wanneer de ruimte er weer boven komt."
+        },
+        "tokens": [
+          {
+            "name": "disk_free_gb",
+            "type": "number",
+            "title": {
+              "en": "Free space (GB)",
+              "nl": "Vrije ruimte (GB)"
+            },
+            "example": 12.5
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          },
+          {
+            "name": "threshold",
+            "type": "number",
+            "title": {
+              "en": "Threshold (GB)",
+              "nl": "Drempelwaarde (GB)"
+            },
+            "min": 0,
+            "step": 1
+          }
+        ],
+        "id": "disk_space_low"
+      },
+      {
+        "title": {
           "en": "A photo or video was uploaded",
           "nl": "Een foto of video werd geüpload"
         },
@@ -194,6 +237,34 @@
       }
     ],
     "conditions": [
+      {
+        "title": {
+          "en": "Free disk space !{{is|is not}} below {{threshold}} GB",
+          "nl": "Vrije schijfruimte !{{is|is niet}} lager dan {{threshold}} GB"
+        },
+        "titleFormatted": {
+          "en": "Free disk space !{{is|is not}} below [[threshold]] GB",
+          "nl": "Vrije schijfruimte !{{is|is niet}} lager dan [[threshold]] GB"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          },
+          {
+            "name": "threshold",
+            "type": "number",
+            "title": {
+              "en": "Threshold (GB)",
+              "nl": "Drempelwaarde (GB)"
+            },
+            "min": 0,
+            "step": 1
+          }
+        ],
+        "id": "disk_space_below"
+      },
       {
         "title": {
           "en": "New photos were uploaded today",
@@ -383,7 +454,12 @@
         "large": "/drivers/immich/assets/images/large.png",
         "xlarge": "/drivers/immich/assets/images/xlarge.png"
       },
-      "capabilities": [],
+      "capabilities": [
+        "immich_photo_count",
+        "immich_video_count",
+        "immich_storage_used",
+        "immich_disk_free"
+      ],
       "settings": [
         {
           "id": "url",
@@ -446,5 +522,75 @@
       ],
       "id": "immich"
     }
-  ]
+  ],
+  "capabilities": {
+    "immich_disk_free": {
+      "type": "number",
+      "title": {
+        "en": "Free Disk Space",
+        "nl": "Vrije schijfruimte"
+      },
+      "units": {
+        "en": "GB",
+        "nl": "GB"
+      },
+      "decimals": 1,
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capabilities/immich_disk_free.svg",
+      "insights": true
+    },
+    "immich_photo_count": {
+      "type": "number",
+      "title": {
+        "en": "Photos",
+        "nl": "Foto's"
+      },
+      "units": {
+        "en": "photos",
+        "nl": "foto's"
+      },
+      "decimals": 0,
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capabilities/immich_photo_count.svg",
+      "insights": true
+    },
+    "immich_storage_used": {
+      "type": "number",
+      "title": {
+        "en": "Storage Used",
+        "nl": "Gebruikte opslag"
+      },
+      "units": {
+        "en": "GB",
+        "nl": "GB"
+      },
+      "decimals": 1,
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capabilities/immich_storage_used.svg",
+      "insights": true
+    },
+    "immich_video_count": {
+      "type": "number",
+      "title": {
+        "en": "Videos",
+        "nl": "Video's"
+      },
+      "units": {
+        "en": "videos",
+        "nl": "video's"
+      },
+      "decimals": 0,
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capabilities/immich_video_count.svg",
+      "insights": true
+    }
+  }
 }

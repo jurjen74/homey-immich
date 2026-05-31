@@ -1,0 +1,20 @@
+{
+  "title": {
+    "en": "Free disk space !{{is|is not}} below {{threshold}} GB",
+    "nl": "Vrije schijfruimte !{{is|is niet}} lager dan {{threshold}} GB"
+  },
+  "titleFormatted": {
+    "en": "Free disk space !{{is|is not}} below [[threshold]] GB",
+    "nl": "Vrije schijfruimte !{{is|is niet}} lager dan [[threshold]] GB"
+  },
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" },
+    {
+      "name": "threshold",
+      "type": "number",
+      "title": { "en": "Threshold (GB)", "nl": "Drempelwaarde (GB)" },
+      "min": 0,
+      "step": 1
+    }
+  ]
+}

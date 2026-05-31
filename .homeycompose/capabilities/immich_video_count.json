@@ -1,0 +1,11 @@
+{
+  "type": "number",
+  "title": { "en": "Videos", "nl": "Video's" },
+  "units": { "en": "videos", "nl": "video's" },
+  "decimals": 0,
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/capabilities/immich_video_count.svg",
+  "insights": true
+}
