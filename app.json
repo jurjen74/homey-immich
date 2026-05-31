@@ -1070,6 +1070,78 @@
       "id": "immich"
     }
   ],
+  "widgets": {
+    "immich_photo": {
+      "name": {
+        "en": "Immich Photo",
+        "nl": "Immich Foto"
+      },
+      "height": 220,
+      "settings": [
+        {
+          "id": "mode",
+          "type": "dropdown",
+          "title": {
+            "en": "Photo source",
+            "nl": "Fotobron"
+          },
+          "values": [
+            {
+              "id": "random",
+              "label": {
+                "en": "Random photo",
+                "nl": "Willekeurige foto"
+              }
+            },
+            {
+              "id": "latest",
+              "label": {
+                "en": "Latest upload",
+                "nl": "Nieuwste upload"
+              }
+            },
+            {
+              "id": "memory",
+              "label": {
+                "en": "Today's memory",
+                "nl": "Herinnering van vandaag"
+              }
+            }
+          ],
+          "value": "random"
+        },
+        {
+          "id": "refresh_interval",
+          "type": "number",
+          "title": {
+            "en": "Refresh interval (seconds)",
+            "nl": "Verversingsinterval (seconden)"
+          },
+          "value": 60,
+          "attr": {
+            "min": 10,
+            "max": 3600
+          }
+        },
+        {
+          "id": "show_metadata",
+          "type": "checkbox",
+          "title": {
+            "en": "Show filename and date",
+            "nl": "Bestandsnaam en datum tonen"
+          },
+          "value": true
+        }
+      ],
+      "api": {
+        "getPhoto": {
+          "method": "GET",
+          "path": "/photo"
+        }
+      },
+      "id": "immich_photo"
+    }
+  },
   "capabilities": {
     "immich_album_count": {
       "type": "number",

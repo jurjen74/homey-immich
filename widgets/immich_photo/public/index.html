@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      height: 220px;
+      overflow: hidden;
+      background: #111;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    #photo {
+      width: 100%;
+      height: 220px;
+      position: relative;
+      background: #111 center / cover no-repeat;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    #meta {
+      padding: 10px 14px;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.65));
+      color: #fff;
+      transition: opacity 0.4s;
+    }
+
+    #meta.hidden { opacity: 0; }
+
+    #filename {
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #taken-at {
+      font-size: 11px;
+      opacity: 0.65;
+      margin-top: 2px;
+    }
+
+    #state {
+      display: none;
+      position: absolute;
+      inset: 0;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 13px;
+      text-align: center;
+      padding: 16px;
+    }
+
+    #state.visible { display: flex; }
+  </style>
+</head>
+<body>
+  <div id="photo">
+    <div id="meta" class="hidden">
+      <div id="filename"></div>
+      <div id="taken-at"></div>
+    </div>
+    <div id="state"></div>
+  </div>
+
+  <script>
+    let settings = {};
+    let refreshTimer = null;
+
+    const photoEl  = document.getElementById('photo');
+    const metaEl   = document.getElementById('meta');
+    const filenameEl = document.getElementById('filename');
+    const takenAtEl  = document.getElementById('taken-at');
+    const stateEl  = document.getElementById('state');
+
+    function showState(msg) {
+      stateEl.textContent = msg;
+      stateEl.classList.add('visible');
+      metaEl.classList.add('hidden');
+      photoEl.style.backgroundImage = '';
+    }
+
+    function hideState() {
+      stateEl.classList.remove('visible');
+    }
+
+    async function loadPhoto() {
+      const mode = settings.mode || 'random';
+      try {
+        const photo = await Homey.api('GET', '/photo?mode=' + encodeURIComponent(mode), {});
+
+        photoEl.style.backgroundImage = "url('" + photo.src + "')";
+        hideState();
+
+        if (settings.show_metadata !== false) {
+          filenameEl.textContent = photo.filename || '';
+          if (photo.takenAt) {
+            const d = new Date(photo.takenAt);
+            takenAtEl.textContent = isNaN(d) ? '' : d.toLocaleDateString(undefined, {
+              year: 'numeric', month: 'long', day: 'numeric',
+            });
+          } else {
+            takenAtEl.textContent = '';
+          }
+          metaEl.classList.remove('hidden');
+        } else {
+          metaEl.classList.add('hidden');
+        }
+      } catch (err) {
+        showState(err.message || 'Could not load photo');
+      }
+    }
+
+    function scheduleNext() {
+      if (refreshTimer) clearTimeout(refreshTimer);
+      const ms = Math.max(10, (settings.refresh_interval || 60)) * 1000;
+      refreshTimer = setTimeout(function () {
+        loadPhoto().finally(scheduleNext);
+      }, ms);
+    }
+
+    Homey.ready(function () {
+      Homey.getSettings().then(function (s) {
+        settings = s || {};
+        showState('Loading…');
+        loadPhoto().then(scheduleNext).catch(scheduleNext);
+      }).catch(function () {
+        showState('Could not load settings');
+      });
+    });
+  </script>
+</body>
+</html>
