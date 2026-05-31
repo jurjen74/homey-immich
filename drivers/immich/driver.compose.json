@@ -1,0 +1,54 @@
+{
+  "name": { "en": "Immich", "nl": "Immich" },
+  "class": "other",
+  "images": {
+    "small": "/drivers/immich/assets/images/small.png",
+    "large": "/drivers/immich/assets/images/large.png",
+    "xlarge": "/drivers/immich/assets/images/xlarge.png"
+  },
+  "capabilities": [],
+  "settings": [
+    {
+      "id": "url",
+      "type": "text",
+      "label": { "en": "URL", "nl": "URL" },
+      "hint": {
+        "en": "Immich URL including scheme, e.g. http://192.168.1.100:2283",
+        "nl": "Immich-URL inclusief protocol, bijv. http://192.168.1.100:2283"
+      },
+      "value": "http://192.168.1.100:2283"
+    },
+    {
+      "id": "apiKey",
+      "type": "text",
+      "label": { "en": "API Key", "nl": "API-sleutel" },
+      "value": ""
+    },
+    {
+      "id": "poll_interval",
+      "type": "number",
+      "label": { "en": "Poll interval (seconds)", "nl": "Pollinginterval (seconden)" },
+      "hint": {
+        "en": "How often to check for new uploads and memories.",
+        "nl": "Hoe vaak op nieuwe uploads en herinneringen wordt gecontroleerd."
+      },
+      "value": 60,
+      "attr": { "min": 10, "max": 3600 }
+    }
+  ],
+  "pair": [
+    {
+      "id": "connect",
+      "navigation": { "next": "list_devices" }
+    },
+    {
+      "id": "list_devices",
+      "template": "list_devices",
+      "navigation": { "next": "add_devices" }
+    },
+    {
+      "id": "add_devices",
+      "template": "add_devices"
+    }
+  ]
+}

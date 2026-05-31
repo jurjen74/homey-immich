@@ -1,0 +1,36 @@
+{
+  "title": { "en": "A photo or video was uploaded", "nl": "Een foto of video werd geüpload" },
+  "hint": {
+    "en": "Triggers when a new asset appears in Immich.",
+    "nl": "Activeert wanneer een nieuw bestand in Immich verschijnt."
+  },
+  "tokens": [
+    {
+      "name": "asset_id",
+      "type": "string",
+      "title": { "en": "Asset ID", "nl": "Asset-ID" },
+      "example": { "en": "a1b2c3d4-0000-0000-0000-000000000000", "nl": "a1b2c3d4-0000-0000-0000-000000000000" }
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "title": { "en": "Type", "nl": "Type" },
+      "example": { "en": "IMAGE", "nl": "IMAGE" }
+    },
+    {
+      "name": "filename",
+      "type": "string",
+      "title": { "en": "Filename", "nl": "Bestandsnaam" },
+      "example": { "en": "IMG_1234.jpg", "nl": "IMG_1234.jpg" }
+    },
+    {
+      "name": "taken_at",
+      "type": "string",
+      "title": { "en": "Taken at", "nl": "Gemaakt op" },
+      "example": { "en": "2024-06-01T12:00:00.000Z", "nl": "2024-06-01T12:00:00.000Z" }
+    }
+  ],
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" }
+  ]
+}

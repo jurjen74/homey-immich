@@ -1,0 +1,30 @@
+{
+  "title": { "en": "A person appeared in a new photo", "nl": "Een persoon verscheen in een nieuwe foto" },
+  "titleFormatted": { "en": "[[person]] appeared in a new photo", "nl": "[[person]] verscheen in een nieuwe foto" },
+  "hint": {
+    "en": "Triggers when a recognized person appears in a newly uploaded asset.",
+    "nl": "Activeert wanneer een herkende persoon in een nieuw geüploade foto verschijnt."
+  },
+  "tokens": [
+    {
+      "name": "person_name",
+      "type": "string",
+      "title": { "en": "Person", "nl": "Persoon" },
+      "example": { "en": "Jane", "nl": "Jane" }
+    },
+    {
+      "name": "asset_id",
+      "type": "string",
+      "title": { "en": "Asset ID", "nl": "Asset-ID" },
+      "example": { "en": "a1b2c3d4-0000-0000-0000-000000000000", "nl": "a1b2c3d4-0000-0000-0000-000000000000" }
+    }
+  ],
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" },
+    {
+      "name": "person",
+      "type": "autocomplete",
+      "title": { "en": "Person", "nl": "Persoon" }
+    }
+  ]
+}

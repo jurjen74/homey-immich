@@ -1,0 +1,21 @@
+{
+  "title": { "en": "Create shared link for photo", "nl": "Gedeelde link aanmaken voor foto" },
+  "titleFormatted": { "en": "Create shared link for photo [[asset_id]]", "nl": "Gedeelde link aanmaken voor foto [[asset_id]]" },
+  "tokens": [
+    {
+      "name": "link_url",
+      "type": "string",
+      "title": { "en": "Link URL", "nl": "Link-URL" },
+      "example": { "en": "https://immich.example.com/share/abc123", "nl": "https://immich.example.com/share/abc123" }
+    }
+  ],
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" },
+    {
+      "name": "asset_id",
+      "type": "text",
+      "title": { "en": "Asset ID", "nl": "Asset-ID" },
+      "placeholder": { "en": "Use tag {{asset_id}} from a trigger", "nl": "Gebruik tag {{asset_id}} uit een trigger" }
+    }
+  ]
+}

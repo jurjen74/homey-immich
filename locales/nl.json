@@ -1,0 +1,21 @@
+{
+  "pair": {
+    "connect": {
+      "title": "Verbinding maken met Immich",
+      "subtitle": "Voer uw Immich-URL en API-sleutel in",
+      "label_url": "URL",
+      "placeholder_url": "http://192.168.1.100:2283",
+      "hint_url": "Inclusief protocol en poort indien niet 80/443",
+      "label_apikey": "API-sleutel",
+      "placeholder_apikey": "Plak uw Immich API-sleutel",
+      "hint_apikey": "Te vinden in Immich → Gebruikersinstellingen → API-sleutels → Nieuwe API-sleutel",
+      "btn_test": "Verbinding testen",
+      "btn_testing": "Testen...",
+      "btn_next": "Apparaat toevoegen",
+      "success_connected": "Verbonden met Immich {version}",
+      "error_url_required": "Voer een URL in",
+      "error_apikey_required": "Voer een API-sleutel in",
+      "error_connection_failed": "Verbinding mislukt. Controleer de URL en API-sleutel."
+    }
+  }
+}

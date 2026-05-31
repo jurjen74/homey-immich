@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 14px;
+      color: #1a1a1a;
+      background: #fff;
+      padding: 24px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      background: #FABB2A;
+      border-radius: 50%;
+      padding: 14px;
+    }
+
+    h2 { text-align: center; font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+
+    .subtitle { text-align: center; color: #666; margin-bottom: 24px; font-size: 13px; }
+
+    label { display: block; font-weight: 500; margin-bottom: 4px; color: #333; }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s;
+      margin-bottom: 14px;
+    }
+
+    input:focus { border-color: #FABB2A; }
+    input.error { border-color: #ef4444; }
+    input.success { border-color: #22c55e; }
+
+    .hint { font-size: 12px; color: #888; margin-top: -10px; margin-bottom: 14px; }
+
+    .status-box {
+      display: none;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+    .status-box.error { display: block; background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c; }
+    .status-box.success { display: block; background: #f0fdf4; border: 1px solid #86efac; color: #15803d; }
+
+    .actions { display: flex; gap: 10px; margin-top: 4px; }
+
+    button {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s, background 0.15s;
+    }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    #btn-test { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
+    #btn-test:not(:disabled):hover { background: #e5e7eb; }
+
+    #btn-next { background: #FABB2A; color: #fff; }
+    #btn-next:not(:disabled):hover { background: #e0a820; }
+
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" style="width:100%;height:100%">
+      <path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z"/>
+      <path d="M9 3L7.17 5H4C2.9 5 2 5.9 2 7v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+    </svg>
+  </div>
+  <h2 id="title"></h2>
+  <p class="subtitle" id="subtitle"></p>
+
+  <label for="url" id="label-url"></label>
+  <input id="url" type="text" autocomplete="off" spellcheck="false" />
+  <p class="hint" id="hint-url"></p>
+
+  <label for="apiKey" id="label-apikey"></label>
+  <input id="apiKey" type="password" autocomplete="off" />
+  <p class="hint" id="hint-apikey"></p>
+
+  <div id="status" class="status-box"></div>
+
+  <div class="actions">
+    <button id="btn-test" type="button"></button>
+    <button id="btn-next" type="button" disabled></button>
+  </div>
+
+  <script>
+    const urlInput  = document.getElementById('url');
+    const keyInput  = document.getElementById('apiKey');
+    const statusBox = document.getElementById('status');
+    const btnTest   = document.getElementById('btn-test');
+    const btnNext   = document.getElementById('btn-next');
+
+    document.getElementById('title').textContent        = Homey.__('pair.connect.title');
+    document.getElementById('subtitle').textContent     = Homey.__('pair.connect.subtitle');
+    document.getElementById('label-url').textContent    = Homey.__('pair.connect.label_url');
+    document.getElementById('hint-url').textContent     = Homey.__('pair.connect.hint_url');
+    document.getElementById('label-apikey').textContent = Homey.__('pair.connect.label_apikey');
+    document.getElementById('hint-apikey').textContent  = Homey.__('pair.connect.hint_apikey');
+    urlInput.placeholder                                = Homey.__('pair.connect.placeholder_url');
+    keyInput.placeholder                                = Homey.__('pair.connect.placeholder_apikey');
+    btnTest.textContent                                 = Homey.__('pair.connect.btn_test');
+    btnNext.textContent                                 = Homey.__('pair.connect.btn_next');
+
+    function setStatus(type, msg) {
+      statusBox.className = 'status-box ' + type;
+      statusBox.textContent = msg;
+    }
+    function clearStatus() { statusBox.className = 'status-box'; statusBox.textContent = ''; }
+
+    function setInputState(el, state) {
+      el.classList.remove('error', 'success');
+      if (state) el.classList.add(state);
+    }
+
+    function setLoading(loading) {
+      btnTest.disabled = loading;
+      btnTest.innerHTML = loading
+        ? '<span class="spinner"></span>' + Homey.__('pair.connect.btn_testing')
+        : Homey.__('pair.connect.btn_test');
+    }
+
+    async function testConnection() {
+      const url    = urlInput.value.trim();
+      const apiKey = keyInput.value.trim();
+
+      if (!url) {
+        setInputState(urlInput, 'error');
+        setStatus('error', Homey.__('pair.connect.error_url_required'));
+        urlInput.focus();
+        return;
+      }
+      if (!apiKey) {
+        setInputState(keyInput, 'error');
+        setStatus('error', Homey.__('pair.connect.error_apikey_required'));
+        keyInput.focus();
+        return;
+      }
+
+      clearStatus();
+      setInputState(urlInput, null);
+      setInputState(keyInput, null);
+      btnNext.disabled = true;
+      setLoading(true);
+
+      try {
+        const result = await Homey.emit('test_connection', { url, apiKey });
+        setInputState(urlInput, 'success');
+        setInputState(keyInput, 'success');
+        setStatus('success', Homey.__('pair.connect.success_connected', { version: result.version }));
+        btnNext.disabled = false;
+      } catch (err) {
+        setInputState(urlInput, 'error');
+        setInputState(keyInput, 'error');
+        setStatus('error', err.message || Homey.__('pair.connect.error_connection_failed'));
+        btnNext.disabled = true;
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    btnTest.addEventListener('click', testConnection);
+    btnNext.addEventListener('click', () => Homey.nextView());
+    keyInput.addEventListener('keydown', e => { if (e.key === 'Enter') testConnection(); });
+
+    function onInputChange() {
+      btnNext.disabled = true;
+      setInputState(urlInput, null);
+      setInputState(keyInput, null);
+      clearStatus();
+    }
+    urlInput.addEventListener('input', onInputChange);
+    keyInput.addEventListener('input', onInputChange);
+  </script>
+</body>
+</html>

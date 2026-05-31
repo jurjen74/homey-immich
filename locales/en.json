@@ -1,1 +1,21 @@
-{}
+{
+  "pair": {
+    "connect": {
+      "title": "Connect to Immich",
+      "subtitle": "Enter your Immich URL and API key",
+      "label_url": "URL",
+      "placeholder_url": "http://192.168.1.100:2283",
+      "hint_url": "Include scheme and port if not 80/443",
+      "label_apikey": "API Key",
+      "placeholder_apikey": "Paste your Immich API key",
+      "hint_apikey": "Find in Immich → User Settings → API Keys → New API Key",
+      "btn_test": "Test connection",
+      "btn_testing": "Testing...",
+      "btn_next": "Add device",
+      "success_connected": "Connected to Immich {version}",
+      "error_url_required": "Please enter a URL",
+      "error_apikey_required": "Please enter an API key",
+      "error_connection_failed": "Connection failed. Check URL and API key."
+    }
+  }
+}

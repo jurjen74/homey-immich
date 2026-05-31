@@ -1,0 +1,21 @@
+{
+  "title": { "en": "Run Immich background job", "nl": "Immich-achtergrondtaak uitvoeren" },
+  "titleFormatted": { "en": "Run Immich job [[job]]", "nl": "Immich-taak [[job]] uitvoeren" },
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" },
+    {
+      "name": "job",
+      "type": "dropdown",
+      "title": { "en": "Job", "nl": "Taak" },
+      "values": [
+        { "id": "thumbnailGeneration", "label": { "en": "Generate thumbnails", "nl": "Miniaturen genereren" } },
+        { "id": "metadataExtraction", "label": { "en": "Extract metadata", "nl": "Metadata extraheren" } },
+        { "id": "faceDetection", "label": { "en": "Detect faces", "nl": "Gezichten detecteren" } },
+        { "id": "facialRecognition", "label": { "en": "Facial recognition", "nl": "Gezichtsherkenning" } },
+        { "id": "smartSearch", "label": { "en": "Smart search (AI)", "nl": "Slim zoeken (AI)" } },
+        { "id": "duplicateDetection", "label": { "en": "Detect duplicates", "nl": "Duplicaten detecteren" } },
+        { "id": "storageTemplateMigration", "label": { "en": "Storage template migration", "nl": "Opslagsjabloonmigratie" } }
+      ]
+    }
+  ]
+}

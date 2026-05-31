@@ -1,0 +1,6 @@
+{
+  "title": { "en": "New photos were uploaded today", "nl": "Er zijn vandaag nieuwe foto's geüpload" },
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" }
+  ]
+}

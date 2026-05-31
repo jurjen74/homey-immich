@@ -1,0 +1,18 @@
+{
+  "title": { "en": "Add photo to album", "nl": "Foto aan album toevoegen" },
+  "titleFormatted": { "en": "Add photo [[asset_id]] to album [[album]]", "nl": "Foto [[asset_id]] toevoegen aan album [[album]]" },
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" },
+    {
+      "name": "album",
+      "type": "autocomplete",
+      "title": { "en": "Album", "nl": "Album" }
+    },
+    {
+      "name": "asset_id",
+      "type": "text",
+      "title": { "en": "Asset ID", "nl": "Asset-ID" },
+      "placeholder": { "en": "Use tag {{asset_id}} from a trigger", "nl": "Gebruik tag {{asset_id}} uit een trigger" }
+    }
+  ]
+}

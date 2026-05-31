@@ -1,0 +1,24 @@
+{
+  "title": { "en": "An \"On This Day\" memory is available", "nl": "Er is een \"Op deze dag\" herinnering beschikbaar" },
+  "hint": {
+    "en": "Triggers once per day when Immich has On This Day memories for today.",
+    "nl": "Activeert eenmaal per dag wanneer Immich herinneringen heeft voor vandaag."
+  },
+  "tokens": [
+    {
+      "name": "year",
+      "type": "number",
+      "title": { "en": "Year", "nl": "Jaar" },
+      "example": { "en": 2022, "nl": 2022 }
+    },
+    {
+      "name": "asset_count",
+      "type": "number",
+      "title": { "en": "Photos", "nl": "Foto's" },
+      "example": { "en": 5, "nl": 5 }
+    }
+  ],
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" }
+  ]
+}
