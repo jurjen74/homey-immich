@@ -17,6 +17,7 @@
   "category": [
     "internet"
   ],
+  "brandColor": "#4A3800",
   "permissions": [],
   "images": {
     "small": "/assets/images/small.png",
@@ -26,5 +27,424 @@
   "author": {
     "name": "Jurjen Ladenius",
     "email": "jurjen@ladenius.net"
-  }
+  },
+  "flow": {
+    "triggers": [
+      {
+        "title": {
+          "en": "A photo or video was uploaded",
+          "nl": "Een foto of video werd geüpload"
+        },
+        "hint": {
+          "en": "Triggers when a new asset appears in Immich.",
+          "nl": "Activeert wanneer een nieuw bestand in Immich verschijnt."
+        },
+        "tokens": [
+          {
+            "name": "asset_id",
+            "type": "string",
+            "title": {
+              "en": "Asset ID",
+              "nl": "Asset-ID"
+            },
+            "example": {
+              "en": "a1b2c3d4-0000-0000-0000-000000000000",
+              "nl": "a1b2c3d4-0000-0000-0000-000000000000"
+            }
+          },
+          {
+            "name": "type",
+            "type": "string",
+            "title": {
+              "en": "Type",
+              "nl": "Type"
+            },
+            "example": {
+              "en": "IMAGE",
+              "nl": "IMAGE"
+            }
+          },
+          {
+            "name": "filename",
+            "type": "string",
+            "title": {
+              "en": "Filename",
+              "nl": "Bestandsnaam"
+            },
+            "example": {
+              "en": "IMG_1234.jpg",
+              "nl": "IMG_1234.jpg"
+            }
+          },
+          {
+            "name": "taken_at",
+            "type": "string",
+            "title": {
+              "en": "Taken at",
+              "nl": "Gemaakt op"
+            },
+            "example": {
+              "en": "2024-06-01T12:00:00.000Z",
+              "nl": "2024-06-01T12:00:00.000Z"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          }
+        ],
+        "id": "new_asset"
+      },
+      {
+        "title": {
+          "en": "An \"On This Day\" memory is available",
+          "nl": "Er is een \"Op deze dag\" herinnering beschikbaar"
+        },
+        "hint": {
+          "en": "Triggers once per day when Immich has On This Day memories for today.",
+          "nl": "Activeert eenmaal per dag wanneer Immich herinneringen heeft voor vandaag."
+        },
+        "tokens": [
+          {
+            "name": "year",
+            "type": "number",
+            "title": {
+              "en": "Year",
+              "nl": "Jaar"
+            },
+            "example": 2022
+          },
+          {
+            "name": "asset_count",
+            "type": "number",
+            "title": {
+              "en": "Photos",
+              "nl": "Foto's"
+            },
+            "example": 5
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          }
+        ],
+        "id": "new_memory"
+      },
+      {
+        "title": {
+          "en": "A person appeared in a new photo",
+          "nl": "Een persoon verscheen in een nieuwe foto"
+        },
+        "titleFormatted": {
+          "en": "[[person]] appeared in a new photo",
+          "nl": "[[person]] verscheen in een nieuwe foto"
+        },
+        "hint": {
+          "en": "Triggers when a recognized person appears in a newly uploaded asset.",
+          "nl": "Activeert wanneer een herkende persoon in een nieuw geüploade foto verschijnt."
+        },
+        "tokens": [
+          {
+            "name": "person_name",
+            "type": "string",
+            "title": {
+              "en": "Person",
+              "nl": "Persoon"
+            },
+            "example": {
+              "en": "Jane",
+              "nl": "Jane"
+            }
+          },
+          {
+            "name": "asset_id",
+            "type": "string",
+            "title": {
+              "en": "Asset ID",
+              "nl": "Asset-ID"
+            },
+            "example": {
+              "en": "a1b2c3d4-0000-0000-0000-000000000000",
+              "nl": "a1b2c3d4-0000-0000-0000-000000000000"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          },
+          {
+            "name": "person",
+            "type": "autocomplete",
+            "title": {
+              "en": "Person",
+              "nl": "Persoon"
+            }
+          }
+        ],
+        "id": "person_in_new_photo"
+      }
+    ],
+    "conditions": [
+      {
+        "title": {
+          "en": "New photos were uploaded today",
+          "nl": "Er zijn vandaag nieuwe foto's geüpload"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          }
+        ],
+        "id": "new_uploads_today"
+      }
+    ],
+    "actions": [
+      {
+        "title": {
+          "en": "Add photo to album",
+          "nl": "Foto aan album toevoegen"
+        },
+        "titleFormatted": {
+          "en": "Add photo [[asset_id]] to album [[album]]",
+          "nl": "Foto [[asset_id]] toevoegen aan album [[album]]"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          },
+          {
+            "name": "album",
+            "type": "autocomplete",
+            "title": {
+              "en": "Album",
+              "nl": "Album"
+            }
+          },
+          {
+            "name": "asset_id",
+            "type": "text",
+            "title": {
+              "en": "Asset ID",
+              "nl": "Asset-ID"
+            },
+            "placeholder": {
+              "en": "Use tag {{asset_id}} from a trigger",
+              "nl": "Gebruik tag {{asset_id}} uit een trigger"
+            }
+          }
+        ],
+        "id": "add_to_album"
+      },
+      {
+        "title": {
+          "en": "Create shared link for photo",
+          "nl": "Gedeelde link aanmaken voor foto"
+        },
+        "titleFormatted": {
+          "en": "Create shared link for photo [[asset_id]]",
+          "nl": "Gedeelde link aanmaken voor foto [[asset_id]]"
+        },
+        "tokens": [
+          {
+            "name": "link_url",
+            "type": "string",
+            "title": {
+              "en": "Link URL",
+              "nl": "Link-URL"
+            },
+            "example": {
+              "en": "https://immich.example.com/share/abc123",
+              "nl": "https://immich.example.com/share/abc123"
+            }
+          }
+        ],
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          },
+          {
+            "name": "asset_id",
+            "type": "text",
+            "title": {
+              "en": "Asset ID",
+              "nl": "Asset-ID"
+            },
+            "placeholder": {
+              "en": "Use tag {{asset_id}} from a trigger",
+              "nl": "Gebruik tag {{asset_id}} uit een trigger"
+            }
+          }
+        ],
+        "id": "create_shared_link"
+      },
+      {
+        "title": {
+          "en": "Run Immich background job",
+          "nl": "Immich-achtergrondtaak uitvoeren"
+        },
+        "titleFormatted": {
+          "en": "Run Immich job [[job]]",
+          "nl": "Immich-taak [[job]] uitvoeren"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=immich"
+          },
+          {
+            "name": "job",
+            "type": "dropdown",
+            "title": {
+              "en": "Job",
+              "nl": "Taak"
+            },
+            "values": [
+              {
+                "id": "thumbnailGeneration",
+                "label": {
+                  "en": "Generate thumbnails",
+                  "nl": "Miniaturen genereren"
+                }
+              },
+              {
+                "id": "metadataExtraction",
+                "label": {
+                  "en": "Extract metadata",
+                  "nl": "Metadata extraheren"
+                }
+              },
+              {
+                "id": "faceDetection",
+                "label": {
+                  "en": "Detect faces",
+                  "nl": "Gezichten detecteren"
+                }
+              },
+              {
+                "id": "facialRecognition",
+                "label": {
+                  "en": "Facial recognition",
+                  "nl": "Gezichtsherkenning"
+                }
+              },
+              {
+                "id": "smartSearch",
+                "label": {
+                  "en": "Smart search (AI)",
+                  "nl": "Slim zoeken (AI)"
+                }
+              },
+              {
+                "id": "duplicateDetection",
+                "label": {
+                  "en": "Detect duplicates",
+                  "nl": "Duplicaten detecteren"
+                }
+              },
+              {
+                "id": "storageTemplateMigration",
+                "label": {
+                  "en": "Storage template migration",
+                  "nl": "Opslagsjabloonmigratie"
+                }
+              }
+            ]
+          }
+        ],
+        "id": "trigger_job"
+      }
+    ]
+  },
+  "drivers": [
+    {
+      "name": {
+        "en": "Immich",
+        "nl": "Immich"
+      },
+      "class": "other",
+      "images": {
+        "small": "/drivers/immich/assets/images/small.png",
+        "large": "/drivers/immich/assets/images/large.png",
+        "xlarge": "/drivers/immich/assets/images/xlarge.png"
+      },
+      "capabilities": [],
+      "settings": [
+        {
+          "id": "url",
+          "type": "text",
+          "label": {
+            "en": "URL",
+            "nl": "URL"
+          },
+          "hint": {
+            "en": "Immich URL including scheme, e.g. http://192.168.1.100:2283",
+            "nl": "Immich-URL inclusief protocol, bijv. http://192.168.1.100:2283"
+          },
+          "value": "http://192.168.1.100:2283"
+        },
+        {
+          "id": "apiKey",
+          "type": "text",
+          "label": {
+            "en": "API Key",
+            "nl": "API-sleutel"
+          },
+          "value": ""
+        },
+        {
+          "id": "poll_interval",
+          "type": "number",
+          "label": {
+            "en": "Poll interval (seconds)",
+            "nl": "Pollinginterval (seconden)"
+          },
+          "hint": {
+            "en": "How often to check for new uploads and memories.",
+            "nl": "Hoe vaak op nieuwe uploads en herinneringen wordt gecontroleerd."
+          },
+          "value": 60,
+          "attr": {
+            "min": 10,
+            "max": 3600
+          }
+        }
+      ],
+      "pair": [
+        {
+          "id": "connect",
+          "navigation": {
+            "next": "list_devices"
+          }
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "id": "immich"
+    }
+  ]
 }
