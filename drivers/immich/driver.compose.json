@@ -10,7 +10,9 @@
     "immich_photo_count",
     "immich_video_count",
     "immich_storage_used",
-    "immich_disk_free"
+    "immich_disk_free",
+    "immich_person_count",
+    "immich_album_count"
   ],
   "settings": [
     {

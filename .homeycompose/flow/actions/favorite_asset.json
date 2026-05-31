@@ -1,0 +1,17 @@
+{
+  "title": { "en": "Favourite an asset", "nl": "Asset als favoriet markeren" },
+  "titleFormatted": { "en": "Favourite asset [[asset_id]]", "nl": "Asset [[asset_id]] als favoriet markeren" },
+  "hint": {
+    "en": "Mark an asset as a favourite in Immich.",
+    "nl": "Markeer een bestand als favoriet in Immich."
+  },
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" },
+    {
+      "name": "asset_id",
+      "type": "text",
+      "title": { "en": "Asset ID", "nl": "Asset-ID" },
+      "placeholder": { "en": "a1b2c3d4-0000-0000-0000-000000000000", "nl": "a1b2c3d4-0000-0000-0000-000000000000" }
+    }
+  ]
+}

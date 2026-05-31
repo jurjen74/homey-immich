@@ -17,6 +17,12 @@
       "type": "string",
       "title": { "en": "Asset ID", "nl": "Asset-ID" },
       "example": { "en": "a1b2c3d4-0000-0000-0000-000000000000", "nl": "a1b2c3d4-0000-0000-0000-000000000000" }
+    },
+    {
+      "name": "thumb_url",
+      "type": "string",
+      "title": { "en": "Thumbnail URL", "nl": "Miniatuur-URL" },
+      "example": { "en": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail", "nl": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail" }
     }
   ],
   "args": [

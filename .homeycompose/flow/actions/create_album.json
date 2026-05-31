@@ -1,0 +1,25 @@
+{
+  "title": { "en": "Create an album", "nl": "Album aanmaken" },
+  "titleFormatted": { "en": "Create album [[album_name]]", "nl": "Album [[album_name]] aanmaken" },
+  "hint": {
+    "en": "Create a new album in Immich and return its ID.",
+    "nl": "Maak een nieuw album aan in Immich en geef het ID terug."
+  },
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" },
+    {
+      "name": "album_name",
+      "type": "text",
+      "title": { "en": "Album name", "nl": "Albumnaam" },
+      "placeholder": { "en": "My new album", "nl": "Mijn nieuwe album" }
+    }
+  ],
+  "tokens": [
+    {
+      "name": "album_id",
+      "type": "string",
+      "title": { "en": "Album ID", "nl": "Album-ID" },
+      "example": { "en": "a1b2c3d4-0000-0000-0000-000000000000", "nl": "a1b2c3d4-0000-0000-0000-000000000000" }
+    }
+  ]
+}

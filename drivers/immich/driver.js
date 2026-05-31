@@ -49,11 +49,23 @@ class ImmichDriver extends Homey.Driver {
     this.homey.flow.getConditionCard('new_uploads_today')
       .registerRunListener(({ device }) => device.cmdHasNewUploadsToday());
 
+    this.homey.flow.getConditionCard('uploads_in_last_x_minutes')
+      .registerRunListener(({ device, args }) => device.cmdHasUploadsInLastMinutes(args.minutes));
+
     this.homey.flow.getActionCard('create_shared_link')
       .registerRunListener(({ device, args }) => device.cmdCreateSharedLink(args.asset_id));
 
     this.homey.flow.getActionCard('trigger_job')
       .registerRunListener(({ device, args }) => device.cmdTriggerJob(args.job));
+
+    this.homey.flow.getActionCard('favorite_asset')
+      .registerRunListener(({ device, args }) => device.cmdFavoriteAsset(args.asset_id));
+
+    this.homey.flow.getActionCard('archive_asset')
+      .registerRunListener(({ device, args }) => device.cmdArchiveAsset(args.asset_id));
+
+    const createAlbumCard = this.homey.flow.getActionCard('create_album');
+    createAlbumCard.registerRunListener(({ device, args }) => device.cmdCreateAlbum(args.album_name));
   }
 
   triggerNewAsset(device, tokens) {

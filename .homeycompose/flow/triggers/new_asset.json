@@ -28,6 +28,12 @@
       "type": "string",
       "title": { "en": "Taken at", "nl": "Gemaakt op" },
       "example": { "en": "2024-06-01T12:00:00.000Z", "nl": "2024-06-01T12:00:00.000Z" }
+    },
+    {
+      "name": "thumb_url",
+      "type": "string",
+      "title": { "en": "Thumbnail URL", "nl": "Miniatuur-URL" },
+      "example": { "en": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail", "nl": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail" }
     }
   ],
   "args": [

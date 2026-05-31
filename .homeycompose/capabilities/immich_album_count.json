@@ -1,0 +1,11 @@
+{
+  "type": "number",
+  "title": { "en": "Albums", "nl": "Albums" },
+  "units": { "en": "albums", "nl": "albums" },
+  "decimals": 0,
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/capabilities/immich_album_count.svg",
+  "insights": true
+}

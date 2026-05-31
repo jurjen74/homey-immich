@@ -1,0 +1,17 @@
+{
+  "title": { "en": "Archive an asset", "nl": "Asset archiveren" },
+  "titleFormatted": { "en": "Archive asset [[asset_id]]", "nl": "Asset [[asset_id]] archiveren" },
+  "hint": {
+    "en": "Move an asset to the archive in Immich.",
+    "nl": "Verplaats een bestand naar het archief in Immich."
+  },
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" },
+    {
+      "name": "asset_id",
+      "type": "text",
+      "title": { "en": "Asset ID", "nl": "Asset-ID" },
+      "placeholder": { "en": "a1b2c3d4-0000-0000-0000-000000000000", "nl": "a1b2c3d4-0000-0000-0000-000000000000" }
+    }
+  ]
+}

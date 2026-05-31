@@ -11,7 +11,10 @@ class ImmichDevice extends Homey.Device {
     this._lastMemoryDate = null;     // checked on first poll
     this._prevDiskFreeGb = null;
 
-    for (const cap of ['immich_photo_count', 'immich_video_count', 'immich_storage_used', 'immich_disk_free']) {
+    for (const cap of [
+      'immich_photo_count', 'immich_video_count', 'immich_storage_used', 'immich_disk_free',
+      'immich_person_count', 'immich_album_count',
+    ]) {
       if (!this.hasCapability(cap)) await this.addCapability(cap);
     }
 
@@ -49,9 +52,11 @@ class ImmichDevice extends Homey.Device {
   }
 
   async _checkServerStats() {
-    const [statsResult, storageResult] = await Promise.allSettled([
+    const [statsResult, storageResult, peopleResult, albumsResult] = await Promise.allSettled([
       this._api.getServerStatistics(),
       this._api.getServerStorage(),
+      this._api.getPeople(),
+      this._api.getAlbums(),
     ]);
 
     if (statsResult.status === 'fulfilled') {
@@ -62,7 +67,7 @@ class ImmichDevice extends Homey.Device {
         this.setCapabilityValue('immich_storage_used', parseFloat(((s?.usage ?? 0) / 1e9).toFixed(1))),
       ]);
     } else {
-      this.log('Server statistics unavailable (non-admin key?):', storageResult.reason?.message);
+      this.log('Server statistics unavailable (non-admin key?):', statsResult.reason?.message);
     }
 
     if (storageResult.status === 'fulfilled') {
@@ -81,6 +86,16 @@ class ImmichDevice extends Homey.Device {
     } else {
       this.log('Server storage unavailable:', storageResult.reason?.message);
     }
+
+    if (peopleResult.status === 'fulfilled') {
+      const count = peopleResult.value?.total ?? (peopleResult.value?.people?.length ?? 0);
+      await this.setCapabilityValue('immich_person_count', count);
+    }
+
+    if (albumsResult.status === 'fulfilled') {
+      const count = Array.isArray(albumsResult.value) ? albumsResult.value.length : 0;
+      await this.setCapabilityValue('immich_album_count', count);
+    }
   }
 
   async _checkNewAssets() {
@@ -91,19 +106,22 @@ class ImmichDevice extends Homey.Device {
       withPeople: true,
     });
 
+    const baseUrl = this.getSetting('url').replace(/\/$/, '');
     for (const asset of (result?.assets?.items ?? [])) {
+      const thumb_url = `${baseUrl}/api/assets/${asset.id}/thumbnail`;
       this.driver.triggerNewAsset(this, {
         asset_id: asset.id,
         type: asset.type ?? 'IMAGE',
         filename: asset.originalFileName ?? '',
         taken_at: asset.fileCreatedAt ?? '',
+        thumb_url,
       }).catch(this.error.bind(this));
 
       for (const person of (asset.people ?? [])) {
         if (!person.id || !person.name) continue;
         this.driver.triggerPersonInNewPhoto(
           this,
-          { person_name: person.name, asset_id: asset.id },
+          { person_name: person.name, asset_id: asset.id, thumb_url },
           { personId: person.id },
         ).catch(this.error.bind(this));
       }
@@ -157,6 +175,26 @@ class ImmichDevice extends Homey.Device {
 
   async cmdTriggerJob(jobId) {
     await this._api.triggerJob(jobId);
+  }
+
+  async cmdFavoriteAsset(assetId) {
+    await this._api.updateAssets([assetId], { isFavorite: true });
+  }
+
+  async cmdArchiveAsset(assetId) {
+    await this._api.updateAssets([assetId], { isArchived: true });
+  }
+
+  async cmdCreateAlbum(albumName) {
+    const album = await this._api.createAlbum(albumName);
+    if (!album?.id) throw new Error('No album ID in response');
+    return { album_id: album.id };
+  }
+
+  async cmdHasUploadsInLastMinutes(minutes) {
+    const since = new Date(Date.now() - minutes * 60 * 1000);
+    const result = await this._api.searchAssets({ createdAfter: since, size: 1 });
+    return (result?.assets?.total ?? 0) > 0;
   }
 
 }

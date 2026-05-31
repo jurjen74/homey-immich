@@ -1,0 +1,11 @@
+{
+  "type": "number",
+  "title": { "en": "People", "nl": "Personen" },
+  "units": { "en": "people", "nl": "personen" },
+  "decimals": 0,
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/capabilities/immich_person_count.svg",
+  "insights": true
+}

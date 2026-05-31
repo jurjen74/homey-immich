@@ -1,0 +1,26 @@
+{
+  "title": {
+    "en": "!{{There were|There were no}} uploads in the last [[minutes]] minutes",
+    "nl": "!{{Er waren|Er waren geen}} uploads in de laatste [[minutes]] minuten"
+  },
+  "titleFormatted": {
+    "en": "!{{There were|There were no}} uploads in the last [[minutes]] minutes",
+    "nl": "!{{Er waren|Er waren geen}} uploads in de laatste [[minutes]] minuten"
+  },
+  "hint": {
+    "en": "Checks whether any assets were uploaded to Immich within the given number of minutes.",
+    "nl": "Controleert of er in het opgegeven aantal minuten bestanden naar Immich zijn geüpload."
+  },
+  "args": [
+    { "name": "device", "type": "device", "filter": "driver_id=immich" },
+    {
+      "name": "minutes",
+      "type": "number",
+      "title": { "en": "Minutes", "nl": "Minuten" },
+      "placeholder": { "en": "30", "nl": "30" },
+      "min": 1,
+      "max": 1440,
+      "step": 1
+    }
+  ]
+}
