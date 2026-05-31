@@ -14,7 +14,7 @@ homey app run                 # run on Homey during development
 homey app install             # install on Homey
 ```
 
-No build step — runs directly as Node.js. `env.json` (gitignored) holds secrets for local development.
+No build step — runs directly as Node.js. All user configuration (URL, API key, poll interval) is entered through Homey's device pairing UI — no config files needed.
 
 ## Architecture
 
