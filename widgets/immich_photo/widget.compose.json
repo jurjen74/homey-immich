@@ -1,42 +1,69 @@
 {
   "name": { "en": "Immich Photo", "nl": "Immich Foto" },
-  "height": 220,
+  "devices": {
+    "type": "app",
+    "singular": true,
+    "filter": {
+      "capabilities": "immich_photo_count"
+    }
+  },
   "settings": [
     {
-      "id": "device",
+      "id": "aspect",
+      "type": "dropdown",
+      "label": { "en": "Widget shape", "nl": "Widgetvorm" },
+      "value": "landscape",
+      "values": [
+        { "id": "square",    "label": { "en": "Square (1:1)",      "nl": "Vierkant (1:1)" } },
+        { "id": "landscape", "label": { "en": "Landscape (3:2)",   "nl": "Liggend (3:2)" } },
+        { "id": "wide",      "label": { "en": "Wide (16:9)",       "nl": "Breed (16:9)" } },
+        { "id": "portrait",  "label": { "en": "Portrait (2:3)",    "nl": "Staand (2:3)" } },
+        { "id": "tall",      "label": { "en": "Tall (9:16)",       "nl": "Hoog (9:16)" } }
+      ]
+    },
+    {
+      "id": "fit",
+      "type": "dropdown",
+      "label": { "en": "Photo fit", "nl": "Foto-uitsnede" },
+      "value": "cover",
+      "values": [
+        { "id": "cover",   "label": { "en": "Fill (crop edges)",       "nl": "Vullen (randen bijsnijden)" } },
+        { "id": "contain", "label": { "en": "Fit (show whole photo)",  "nl": "Passend (hele foto tonen)" } }
+      ]
+    },
+    {
+      "id": "album",
       "type": "autocomplete",
-      "title": { "en": "Device", "nl": "Apparaat" }
+      "label": { "en": "Album", "nl": "Album" }
     },
     {
       "id": "mode",
       "type": "dropdown",
-      "title": { "en": "Photo source", "nl": "Fotobron" },
+      "label": { "en": "Photo source", "nl": "Fotobron" },
+      "value": "random",
       "values": [
         { "id": "random", "label": { "en": "Random photo", "nl": "Willekeurige foto" } },
         { "id": "latest", "label": { "en": "Latest upload", "nl": "Nieuwste upload" } },
         { "id": "memory", "label": { "en": "Today's memory", "nl": "Herinnering van vandaag" } }
-      ],
-      "value": "random"
+      ]
     },
     {
       "id": "refresh_interval",
       "type": "number",
-      "title": { "en": "Refresh interval (seconds)", "nl": "Verversingsinterval (seconden)" },
+      "label": { "en": "Refresh interval (seconds)", "nl": "Verversingsinterval (seconden)" },
       "value": 60,
-      "attr": { "min": 10, "max": 3600 }
+      "min": 10,
+      "max": 3600,
+      "step": 1
     },
     {
       "id": "show_metadata",
       "type": "checkbox",
-      "title": { "en": "Show filename and date", "nl": "Bestandsnaam en datum tonen" },
+      "label": { "en": "Show filename and date", "nl": "Bestandsnaam en datum tonen" },
       "value": true
     }
   ],
   "api": {
-    "getDevices": {
-      "method": "GET",
-      "path": "/devices"
-    },
     "getPhoto": {
       "method": "GET",
       "path": "/photo"

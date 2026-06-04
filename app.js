@@ -2,38 +2,47 @@
 
 const Homey = require('homey');
 
+const ALL_PHOTOS_ID = '__all__';
+
 module.exports = class ImmichApp extends Homey.App {
 
   async onInit() {
-    this._registerWidgetAutocomplete();
+    try {
+      const widgetManager = this.homey.dashboards ?? this.homey.widgets;
+      widgetManager.getWidget('immich_photo')
+        .registerSettingAutocompleteListener('album', (query) => this._albumAutocomplete(query));
+      this.log('Album autocomplete registered');
+    } catch (err) {
+      this.log('Album autocomplete registration failed:', err.message);
+    }
+
     this.log('ImmichApp initialized');
   }
 
-  _registerWidgetAutocomplete(attempt = 0) {
-    if (!this.homey.widgets) {
-      // Retry up to ~30 s in case the widgets manager initializes after onInit
-      if (attempt < 6) {
-        const delay = attempt === 0 ? 0 : Math.min(1000 * 2 ** (attempt - 1), 10000);
-        setTimeout(() => this._registerWidgetAutocomplete(attempt + 1), delay);
-      } else {
-        this.log('Widget API not available on this platform; device autocomplete inactive');
+  async _albumAutocomplete(query) {
+    const devices = this.homey.drivers.getDriver('immich').getDevices();
+    const multiple = devices.length > 1;
+
+    const results = [{ id: ALL_PHOTOS_ID, name: 'All photos' }];
+
+    for (const device of devices) {
+      try {
+        const albums = await device._api.getAlbums();
+        if (!Array.isArray(albums)) continue;
+        for (const album of albums) {
+          results.push({
+            id: album.id,
+            name: multiple ? `${album.albumName} (${device.getName()})` : album.albumName,
+            description: album.assetCount ? `${album.assetCount} photos` : undefined,
+          });
+        }
+      } catch (err) {
+        this.log('Failed to list albums for', device.getName(), '-', err.message);
       }
-      return;
     }
 
-    try {
-      this.homey.widgets.getWidget('immich_photo')
-        .registerSettingAutocompleteListener('device', async (query) => {
-          const driver = this.homey.drivers.getDriver('immich');
-          const devices = driver.getDevices();
-          return devices
-            .filter(d => d.getName().toLowerCase().includes(query.toLowerCase()))
-            .map(d => ({ id: d.getData().id, name: d.getName() }));
-        });
-      this.log('Widget device autocomplete registered');
-    } catch (err) {
-      this.log('Widget autocomplete registration failed:', err.message);
-    }
+    const q = (query || '').toLowerCase();
+    return results.filter(r => r.name.toLowerCase().includes(q));
   }
 
 };

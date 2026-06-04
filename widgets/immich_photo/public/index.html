@@ -1,35 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: transparent; }
 
-    body {
-      height: 220px;
-      overflow: hidden;
-      background: #111;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    }
-
-    #photo {
-      width: 100%;
-      height: 220px;
+    #wrapper {
       position: relative;
-      background: #111 center / cover no-repeat;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
+      width: 100%;
+      overflow: hidden;
+      background-color: #111;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
     }
+    #wrapper.fit-contain { background-size: contain; }
 
     #meta {
-      padding: 10px 14px;
-      background: linear-gradient(transparent, rgba(0, 0, 0, 0.65));
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      padding: 14px 14px 16px;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
       color: #fff;
-      transition: opacity 0.4s;
+      transition: opacity 0.3s;
     }
-
     #meta.hidden { opacity: 0; }
 
     #filename {
@@ -39,176 +32,106 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     #taken-at {
       font-size: 11px;
-      opacity: 0.65;
+      opacity: 0.7;
       margin-top: 2px;
     }
 
     #state {
-      display: none;
       position: absolute;
       inset: 0;
+      display: flex;
       align-items: center;
       justify-content: center;
-      flex-direction: column;
-      gap: 8px;
-      color: rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 0.55);
       font-size: 13px;
       text-align: center;
-      padding: 16px;
+      padding: var(--homey-su-3);
     }
-
-    #state.visible { display: flex; }
-
-    #device-picker {
-      display: none;
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.88);
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 10px;
-      padding: 20px;
-      z-index: 10;
-    }
-
-    #device-picker.visible { display: flex; }
-
-    #device-picker p {
-      color: rgba(255, 255, 255, 0.75);
-      font-size: 12px;
-      text-align: center;
-    }
-
-    #device-select {
-      width: 100%;
-      padding: 7px 10px;
-      border-radius: 6px;
-      background: #2a2a2a;
-      color: #fff;
-      border: 1px solid #444;
-      font-size: 13px;
-    }
-
-    #device-confirm {
-      padding: 7px 20px;
-      background: #4A3800;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-    }
-
-    #device-confirm:hover { background: #5e4800; }
+    #state.hidden { display: none; }
   </style>
 </head>
-<body>
-  <div id="photo">
+
+<body class="homey-widget">
+  <div id="wrapper">
+    <div id="state">Loading…</div>
     <div id="meta" class="hidden">
       <div id="filename"></div>
       <div id="taken-at"></div>
     </div>
-    <div id="state"></div>
-    <div id="device-picker">
-      <p>Select an Immich device</p>
-      <select id="device-select"></select>
-      <button id="device-confirm">Confirm</button>
-    </div>
   </div>
 
-  <script>
-    var settings = {};
-    var refreshTimer = null;
-    var storedDeviceId = null;
+  <script type="text/javascript">
+    function onHomeyReady(Homey) {
+      Homey.ready();
 
-    var photoEl    = document.getElementById('photo');
-    var metaEl     = document.getElementById('meta');
-    var filenameEl = document.getElementById('filename');
-    var takenAtEl  = document.getElementById('taken-at');
-    var stateEl    = document.getElementById('state');
-    var pickerEl   = document.getElementById('device-picker');
-    var selectEl   = document.getElementById('device-select');
-    var confirmEl  = document.getElementById('device-confirm');
+      const wrapperEl  = document.getElementById('wrapper');
+      const metaEl     = document.getElementById('meta');
+      const filenameEl = document.getElementById('filename');
+      const takenAtEl  = document.getElementById('taken-at');
+      const stateEl    = document.getElementById('state');
 
-    var STORAGE_KEY = 'immich_photo_device_id';
+      const ASPECT_RATIOS = {
+        square:    1 / 1,
+        landscape: 2 / 3,
+        wide:      9 / 16,
+        portrait:  3 / 2,
+        tall:      16 / 9,
+      };
 
-    function showState(msg) {
-      stateEl.textContent = msg;
-      stateEl.classList.add('visible');
-      metaEl.classList.add('hidden');
-      photoEl.style.backgroundImage = '';
-    }
+      let refreshTimer = null;
 
-    function hideState() {
-      stateEl.classList.remove('visible');
-    }
+      function applyLayout() {
+        const settings = Homey.getSettings() || {};
+        const ratio = ASPECT_RATIOS[settings.aspect] || ASPECT_RATIOS.landscape;
+        const width = wrapperEl.getBoundingClientRect().width || 300;
+        const height = Math.max(120, Math.round(width * ratio));
+        wrapperEl.style.height = height + 'px';
+        Homey.setHeight(height);
 
-    function getDeviceId() {
-      return (settings.device && settings.device.id) ||
-             storedDeviceId ||
-             localStorage.getItem(STORAGE_KEY);
-    }
+        wrapperEl.classList.toggle('fit-contain', settings.fit === 'contain');
+      }
 
-    function showDevicePicker(resolve) {
-      showState('');
-      Homey.api('GET', '/devices').then(function (devices) {
-        if (!devices || devices.length === 0) {
-          pickerEl.classList.remove('visible');
-          showState('No Immich devices found');
-          resolve(null);
+      function showState(msg) {
+        stateEl.textContent = msg;
+        stateEl.classList.remove('hidden');
+        metaEl.classList.add('hidden');
+      }
+
+      function hideState() {
+        stateEl.classList.add('hidden');
+      }
+
+      async function loadPhoto() {
+        const settings = Homey.getSettings() || {};
+        const deviceIds = Homey.getDeviceIds() || [];
+        const deviceId = deviceIds[0];
+
+        if (!deviceId) {
+          showState('No device');
           return;
         }
 
-        selectEl.innerHTML = devices.map(function (d) {
-          return '<option value="' + d.id + '">' + d.name + '</option>';
-        }).join('');
+        const mode = settings.mode || 'random';
+        const albumId = (settings.album && settings.album.id) || '';
 
-        pickerEl.classList.add('visible');
+        try {
+          const photo = await Homey.api(
+            'GET',
+            '/photo?mode=' + encodeURIComponent(mode)
+              + '&deviceId=' + encodeURIComponent(deviceId)
+              + '&albumId=' + encodeURIComponent(albumId),
+            null,
+          );
 
-        confirmEl.onclick = function () {
-          var id = selectEl.value;
-          localStorage.setItem(STORAGE_KEY, id);
-          storedDeviceId = id;
-          pickerEl.classList.remove('visible');
-          resolve(id);
-        };
-      }).catch(function () {
-        pickerEl.classList.remove('visible');
-        showState('Could not load devices');
-        resolve(null);
-      });
-    }
-
-    function ensureDevice() {
-      return new Promise(function (resolve) {
-        var id = getDeviceId();
-        if (id) { resolve(id); return; }
-        showDevicePicker(resolve);
-      });
-    }
-
-    function loadPhoto() {
-      return ensureDevice().then(function (deviceId) {
-        if (!deviceId) return;
-
-        var mode = settings.mode || 'random';
-
-        return Homey.api(
-          'GET',
-          '/photo?mode=' + encodeURIComponent(mode) + '&deviceId=' + encodeURIComponent(deviceId),
-          {},
-        ).then(function (photo) {
-          photoEl.style.backgroundImage = "url('" + photo.src + "')";
+          wrapperEl.style.backgroundImage = "url('" + photo.src + "')";
           hideState();
 
           if (settings.show_metadata !== false) {
             filenameEl.textContent = photo.filename || '';
             if (photo.takenAt) {
-              var d = new Date(photo.takenAt);
+              const d = new Date(photo.takenAt);
               takenAtEl.textContent = isNaN(d) ? '' : d.toLocaleDateString(undefined, {
                 year: 'numeric', month: 'long', day: 'numeric',
               });
@@ -219,29 +142,32 @@
           } else {
             metaEl.classList.add('hidden');
           }
-        }).catch(function (err) {
+        } catch (err) {
           showState(err.message || 'Could not load photo');
-        });
-      });
-    }
+        }
+      }
 
-    function scheduleNext() {
-      if (refreshTimer) clearTimeout(refreshTimer);
-      var ms = Math.max(10, (settings.refresh_interval || 60)) * 1000;
-      refreshTimer = setTimeout(function () {
-        loadPhoto().then(scheduleNext).catch(scheduleNext);
-      }, ms);
-    }
+      function schedule() {
+        if (refreshTimer) clearTimeout(refreshTimer);
+        const settings = Homey.getSettings() || {};
+        const ms = Math.max(10, settings.refresh_interval || 60) * 1000;
+        refreshTimer = setTimeout(function () {
+          loadPhoto().finally(schedule);
+        }, ms);
+      }
 
-    Homey.ready(function () {
-      Homey.getSettings().then(function (s) {
-        settings = s || {};
-        showState('Loading…');
-        loadPhoto().then(scheduleNext).catch(scheduleNext);
-      }).catch(function () {
-        showState('Could not load settings');
+      Homey.on('settings.set', function () {
+        applyLayout();
+        loadPhoto();
       });
-    });
+
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(applyLayout).observe(wrapperEl.parentElement || document.body);
+      }
+
+      applyLayout();
+      loadPhoto().finally(schedule);
+    }
   </script>
 </body>
 </html>
