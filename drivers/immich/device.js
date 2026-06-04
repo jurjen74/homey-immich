@@ -8,7 +8,7 @@ class ImmichDevice extends Homey.Device {
   async onInit() {
     this._api = new ImmichApi(this.getSettings());
     this._lastPolledAt = new Date(); // baseline — don't re-trigger for existing assets
-    this._lastMemoryDate = null;     // checked on first poll
+    this._lastMemoryDate = this.getStoreValue('lastMemoryDate') ?? null;
     this._prevDiskFreeGb = null;
     this._prevDuplicateCount = null;
     this._albumAssetCounts = {};
@@ -100,7 +100,9 @@ class ImmichDevice extends Homey.Device {
       const albums = Array.isArray(albumsResult.value) ? albumsResult.value : [];
       await this.setCapabilityValue('immich_album_count', albums.length);
 
+      const currentIds = new Set();
       for (const album of albums) {
+        currentIds.add(album.id);
         const prev = this._albumAssetCounts[album.id];
         const curr = album.assetCount ?? 0;
         if (prev !== undefined && curr > prev) {
@@ -111,6 +113,10 @@ class ImmichDevice extends Homey.Device {
           ).catch(this.error.bind(this));
         }
         this._albumAssetCounts[album.id] = curr;
+      }
+
+      for (const id of Object.keys(this._albumAssetCounts)) {
+        if (!currentIds.has(id)) delete this._albumAssetCounts[id];
       }
     }
 
@@ -131,32 +137,43 @@ class ImmichDevice extends Homey.Device {
   }
 
   async _checkNewAssets() {
-    const result = await this._api.searchAssets({
-      createdAfter: this._lastPolledAt,
-      order: 'asc',
-      size: 100,
-      withPeople: true,
-    });
-
     const baseUrl = this.getSetting('url').replace(/\/$/, '');
-    for (const asset of (result?.assets?.items ?? [])) {
-      const thumb_url = `${baseUrl}/api/assets/${asset.id}/thumbnail`;
-      this.driver.triggerNewAsset(this, {
-        asset_id: asset.id,
-        type: asset.type ?? 'IMAGE',
-        filename: asset.originalFileName ?? '',
-        taken_at: asset.fileCreatedAt ?? '',
-        thumb_url,
-      }).catch(this.error.bind(this));
+    const PAGE_SIZE = 100;
+    const MAX_PAGES = 50;
 
-      for (const person of (asset.people ?? [])) {
-        if (!person.id || !person.name) continue;
-        this.driver.triggerPersonInNewPhoto(
-          this,
-          { person_name: person.name, asset_id: asset.id, thumb_url },
-          { personId: person.id },
-        ).catch(this.error.bind(this));
+    for (let page = 1; page <= MAX_PAGES; page++) {
+      const result = await this._api.searchAssets({
+        createdAfter: this._lastPolledAt,
+        order: 'asc',
+        size: PAGE_SIZE,
+        page,
+        withPeople: true,
+      });
+
+      const items = result?.assets?.items ?? [];
+      if (items.length === 0) break;
+
+      for (const asset of items) {
+        const thumb_url = `${baseUrl}/api/assets/${asset.id}/thumbnail`;
+        this.driver.triggerNewAsset(this, {
+          asset_id: asset.id,
+          type: asset.type ?? 'IMAGE',
+          filename: asset.originalFileName ?? '',
+          taken_at: asset.fileCreatedAt ?? '',
+          thumb_url,
+        }).catch(this.error.bind(this));
+
+        for (const person of (asset.people ?? [])) {
+          if (!person.id || !person.name) continue;
+          this.driver.triggerPersonInNewPhoto(
+            this,
+            { person_name: person.name, asset_id: asset.id, thumb_url },
+            { personId: person.id },
+          ).catch(this.error.bind(this));
+        }
       }
+
+      if (items.length < PAGE_SIZE) break;
     }
   }
 
@@ -173,6 +190,7 @@ class ImmichDevice extends Homey.Device {
     }
 
     this._lastMemoryDate = todayStr;
+    await this.setStoreValue('lastMemoryDate', todayStr);
   }
 
   async onSettings({ newSettings }) {

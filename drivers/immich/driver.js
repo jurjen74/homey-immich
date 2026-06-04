@@ -16,9 +16,10 @@ class ImmichDriver extends Homey.Driver {
       );
 
     this.homey.flow.getConditionCard('disk_space_below')
-      .registerRunListener(({ device, args }) =>
-        device.getCapabilityValue('immich_disk_free') < args.threshold,
-      );
+      .registerRunListener(({ device, args }) => {
+        const free = device.getCapabilityValue('immich_disk_free');
+        return typeof free === 'number' && free < args.threshold;
+      });
 
     this._triggerPersonInNewPhoto = this.homey.flow.getDeviceTriggerCard('person_in_new_photo');
     this._triggerPersonInNewPhoto
@@ -28,8 +29,8 @@ class ImmichDriver extends Homey.Driver {
       .registerAutocompleteListener(async (query, args) => {
         const api = args.device?._api;
         if (!api) return [];
-        const res = await api.getPeople().catch(() => ({ people: [] }));
-        return (res?.people ?? [])
+        const people = await api.getAllPeople().catch(() => []);
+        return people
           .filter(p => p.name && p.name.toLowerCase().includes(query.toLowerCase()))
           .map(p => ({ id: p.id, name: p.name }));
       });

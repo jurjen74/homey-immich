@@ -1,8 +1,8 @@
 {
-  "title": { "en": "An \"On This Day\" memory is available", "nl": "Er is een \"Op deze dag\" herinnering beschikbaar" },
+  "title": { "en": "An \"On This Day\" memory year is available", "nl": "Er is een \"Op deze dag\" herinneringsjaar beschikbaar" },
   "hint": {
-    "en": "Triggers once per day when Immich has On This Day memories for today.",
-    "nl": "Activeert eenmaal per dag wanneer Immich herinneringen heeft voor vandaag."
+    "en": "Fires once per memory year on the first poll of the day (e.g. once for 2022 and again for 2019).",
+    "nl": "Activeert eenmaal per herinneringsjaar bij de eerste controle van de dag (bijv. eenmaal voor 2022 en nogmaals voor 2019)."
   },
   "tokens": [
     {
