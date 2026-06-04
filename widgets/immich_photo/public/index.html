@@ -61,6 +61,49 @@
     }
 
     #state.visible { display: flex; }
+
+    #device-picker {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 10px;
+      padding: 20px;
+      z-index: 10;
+    }
+
+    #device-picker.visible { display: flex; }
+
+    #device-picker p {
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    #device-select {
+      width: 100%;
+      padding: 7px 10px;
+      border-radius: 6px;
+      background: #2a2a2a;
+      color: #fff;
+      border: 1px solid #444;
+      font-size: 13px;
+    }
+
+    #device-confirm {
+      padding: 7px 20px;
+      background: #4A3800;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    #device-confirm:hover { background: #5e4800; }
   </style>
 </head>
 <body>
@@ -70,17 +113,28 @@
       <div id="taken-at"></div>
     </div>
     <div id="state"></div>
+    <div id="device-picker">
+      <p>Select an Immich device</p>
+      <select id="device-select"></select>
+      <button id="device-confirm">Confirm</button>
+    </div>
   </div>
 
   <script>
-    let settings = {};
-    let refreshTimer = null;
+    var settings = {};
+    var refreshTimer = null;
+    var storedDeviceId = null;
 
-    const photoEl  = document.getElementById('photo');
-    const metaEl   = document.getElementById('meta');
-    const filenameEl = document.getElementById('filename');
-    const takenAtEl  = document.getElementById('taken-at');
-    const stateEl  = document.getElementById('state');
+    var photoEl    = document.getElementById('photo');
+    var metaEl     = document.getElementById('meta');
+    var filenameEl = document.getElementById('filename');
+    var takenAtEl  = document.getElementById('taken-at');
+    var stateEl    = document.getElementById('state');
+    var pickerEl   = document.getElementById('device-picker');
+    var selectEl   = document.getElementById('device-select');
+    var confirmEl  = document.getElementById('device-confirm');
+
+    var STORAGE_KEY = 'immich_photo_device_id';
 
     function showState(msg) {
       stateEl.textContent = msg;
@@ -93,49 +147,89 @@
       stateEl.classList.remove('visible');
     }
 
-    async function loadPhoto() {
-      const mode = settings.mode || 'random';
-      const deviceId = settings.device && settings.device.id;
+    function getDeviceId() {
+      return (settings.device && settings.device.id) ||
+             storedDeviceId ||
+             localStorage.getItem(STORAGE_KEY);
+    }
 
-      if (!deviceId) {
-        showState('Select a device in widget settings');
-        return;
-      }
+    function showDevicePicker(resolve) {
+      showState('');
+      Homey.api('GET', '/devices').then(function (devices) {
+        if (!devices || devices.length === 0) {
+          pickerEl.classList.remove('visible');
+          showState('No Immich devices found');
+          resolve(null);
+          return;
+        }
 
-      try {
-        const photo = await Homey.api(
+        selectEl.innerHTML = devices.map(function (d) {
+          return '<option value="' + d.id + '">' + d.name + '</option>';
+        }).join('');
+
+        pickerEl.classList.add('visible');
+
+        confirmEl.onclick = function () {
+          var id = selectEl.value;
+          localStorage.setItem(STORAGE_KEY, id);
+          storedDeviceId = id;
+          pickerEl.classList.remove('visible');
+          resolve(id);
+        };
+      }).catch(function () {
+        pickerEl.classList.remove('visible');
+        showState('Could not load devices');
+        resolve(null);
+      });
+    }
+
+    function ensureDevice() {
+      return new Promise(function (resolve) {
+        var id = getDeviceId();
+        if (id) { resolve(id); return; }
+        showDevicePicker(resolve);
+      });
+    }
+
+    function loadPhoto() {
+      return ensureDevice().then(function (deviceId) {
+        if (!deviceId) return;
+
+        var mode = settings.mode || 'random';
+
+        return Homey.api(
           'GET',
           '/photo?mode=' + encodeURIComponent(mode) + '&deviceId=' + encodeURIComponent(deviceId),
           {},
-        );
+        ).then(function (photo) {
+          photoEl.style.backgroundImage = "url('" + photo.src + "')";
+          hideState();
 
-        photoEl.style.backgroundImage = "url('" + photo.src + "')";
-        hideState();
-
-        if (settings.show_metadata !== false) {
-          filenameEl.textContent = photo.filename || '';
-          if (photo.takenAt) {
-            const d = new Date(photo.takenAt);
-            takenAtEl.textContent = isNaN(d) ? '' : d.toLocaleDateString(undefined, {
-              year: 'numeric', month: 'long', day: 'numeric',
-            });
+          if (settings.show_metadata !== false) {
+            filenameEl.textContent = photo.filename || '';
+            if (photo.takenAt) {
+              var d = new Date(photo.takenAt);
+              takenAtEl.textContent = isNaN(d) ? '' : d.toLocaleDateString(undefined, {
+                year: 'numeric', month: 'long', day: 'numeric',
+              });
+            } else {
+              takenAtEl.textContent = '';
+            }
+            metaEl.classList.remove('hidden');
           } else {
-            takenAtEl.textContent = '';
+            metaEl.classList.add('hidden');
           }
-          metaEl.classList.remove('hidden');
-        } else {
-          metaEl.classList.add('hidden');
-        }
-      } catch (err) {
-        showState(err.message || 'Could not load photo');
-      }
+        }).catch(function (err) {
+          showState(err.message || 'Could not load photo');
+        });
+      });
     }
 
     function scheduleNext() {
       if (refreshTimer) clearTimeout(refreshTimer);
-      const ms = Math.max(10, (settings.refresh_interval || 60)) * 1000;
+      var ms = Math.max(10, (settings.refresh_interval || 60)) * 1000;
       refreshTimer = setTimeout(function () {
-        loadPhoto().finally(scheduleNext);
+        loadPhoto().then(scheduleNext).catch(scheduleNext);
       }, ms);
     }
 

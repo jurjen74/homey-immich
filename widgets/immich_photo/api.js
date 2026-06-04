@@ -2,6 +2,12 @@
 
 module.exports = {
 
+  async getDevices({ homey }) {
+    const driver = homey.drivers.getDriver('immich');
+    const devices = driver.getDevices();
+    return devices.map(d => ({ id: d.getData().id, name: d.getName() }));
+  },
+
   async getPhoto({ homey, query }) {
     const { mode = 'random', deviceId } = query;
 

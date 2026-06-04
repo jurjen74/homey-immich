@@ -33,6 +33,10 @@
     }
   ],
   "api": {
+    "getDevices": {
+      "method": "GET",
+      "path": "/devices"
+    },
     "getPhoto": {
       "method": "GET",
       "path": "/photo"
