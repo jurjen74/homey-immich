@@ -12,6 +12,7 @@ class ImmichDevice extends Homey.Device {
     this._prevDiskFreeGb = null;
     this._prevDuplicateCount = null;
     this._albumAssetCounts = {};
+    this._albumAssetIds = {}; // { albumId: Set<assetId> } — used to identify newly added assets
 
     for (const cap of [
       'immich_photo_count', 'immich_video_count', 'immich_storage_used', 'immich_disk_free',
@@ -106,17 +107,33 @@ class ImmichDevice extends Homey.Device {
         const prev = this._albumAssetCounts[album.id];
         const curr = album.assetCount ?? 0;
         if (prev !== undefined && curr > prev) {
-          this.driver.triggerAlbumGotNewAsset(
-            this,
-            { album_name: album.albumName ?? '', asset_count: curr },
-            { albumId: album.id },
-          ).catch(this.error.bind(this));
+          const newlyAdded = await this._getNewlyAddedAlbumAssets(album.id).catch(() => []);
+          for (const asset of newlyAdded) {
+            const photo = await this._createAssetImage(asset.id).catch(() => null);
+            this.driver.triggerAlbumGotNewAsset(
+              this,
+              {
+                album_name: album.albumName ?? '',
+                asset_count: curr,
+                asset_id: asset.id,
+                filename: asset.originalFileName ?? '',
+                photo,
+              },
+              { albumId: album.id },
+            ).catch(this.error.bind(this));
+          }
+        } else if (prev === undefined && curr > 0) {
+          this._baselineAlbumAssetIds(album.id).catch((err) =>
+            this.log(`Album baseline failed for "${album.albumName}": ${err.message}`));
         }
         this._albumAssetCounts[album.id] = curr;
       }
 
       for (const id of Object.keys(this._albumAssetCounts)) {
-        if (!currentIds.has(id)) delete this._albumAssetCounts[id];
+        if (!currentIds.has(id)) {
+          delete this._albumAssetCounts[id];
+          delete this._albumAssetIds[id];
+        }
       }
     }
 
@@ -155,19 +172,22 @@ class ImmichDevice extends Homey.Device {
 
       for (const asset of items) {
         const thumb_url = `${baseUrl}/api/assets/${asset.id}/thumbnail`;
+        const photo = await this._createAssetImage(asset.id).catch(() => null);
+
         this.driver.triggerNewAsset(this, {
           asset_id: asset.id,
           type: asset.type ?? 'IMAGE',
           filename: asset.originalFileName ?? '',
           taken_at: asset.fileCreatedAt ?? '',
           thumb_url,
+          photo,
         }).catch(this.error.bind(this));
 
         for (const person of (asset.people ?? [])) {
           if (!person.id || !person.name) continue;
           this.driver.triggerPersonInNewPhoto(
             this,
-            { person_name: person.name, asset_id: asset.id, thumb_url },
+            { person_name: person.name, asset_id: asset.id, thumb_url, photo },
             { personId: person.id },
           ).catch(this.error.bind(this));
         }
@@ -183,9 +203,15 @@ class ImmichDevice extends Homey.Device {
 
     const memories = await this._api.getMemories(todayStr);
     for (const memory of (memories ?? [])) {
+      const firstAssetId = memory?.assets?.[0]?.id;
+      const photo = firstAssetId
+        ? await this._createAssetImage(firstAssetId).catch(() => null)
+        : null;
+
       this.driver.triggerNewMemory(this, {
         year: memory?.data?.year ?? 0,
         asset_count: memory?.assets?.length ?? 0,
+        photo,
       }).catch(this.error.bind(this));
     }
 
@@ -201,6 +227,45 @@ class ImmichDevice extends Homey.Device {
 
   onDeleted() {
     this._stopPolling();
+  }
+
+  // ── Image tokens ──────────────────────────────────────────────────────────
+
+  async _createAssetImage(assetId) {
+    const image = await this.homey.images.createImage();
+    await image.setStream(async (stream) => {
+      const res = await this._api.getThumbnailStream(assetId);
+      return res.pipe(stream);
+    });
+    setTimeout(() => image.unregister().catch(() => {}), 10 * 60 * 1000);
+    return image;
+  }
+
+  async _getNewlyAddedAlbumAssets(albumId) {
+    const album = await this._api.getAlbum(albumId);
+    const assets = album?.assets ?? [];
+    if (!assets.length) return [];
+
+    const knownIds = this._albumAssetIds[albumId];
+    this._albumAssetIds[albumId] = new Set(assets.map(a => a.id));
+
+    if (knownIds) {
+      return assets
+        .filter(a => !knownIds.has(a.id))
+        .sort((a, b) =>
+          new Date(a.createdAt ?? 0) - new Date(b.createdAt ?? 0));
+    }
+
+    const newest = assets.slice().sort((a, b) =>
+      new Date(b.createdAt ?? b.updatedAt ?? 0) - new Date(a.createdAt ?? a.updatedAt ?? 0))[0];
+    return newest ? [newest] : [];
+  }
+
+  async _baselineAlbumAssetIds(albumId) {
+    const album = await this._api.getAlbum(albumId);
+    if (album?.assets) {
+      this._albumAssetIds[albumId] = new Set(album.assets.map(a => a.id));
+    }
   }
 
   // ── Flow targets ──────────────────────────────────────────────────────────
@@ -223,12 +288,14 @@ class ImmichDevice extends Homey.Device {
     const asset = Array.isArray(assets) ? assets[0] : assets;
     if (!asset?.id) throw new Error('No random asset found');
     const baseUrl = this.getSetting('url').replace(/\/$/, '');
+    const photo = await this._createAssetImage(asset.id).catch(() => null);
     return {
       asset_id: asset.id,
       type: asset.type ?? 'IMAGE',
       filename: asset.originalFileName ?? '',
       taken_at: asset.fileCreatedAt ?? '',
       thumb_url: `${baseUrl}/api/assets/${asset.id}/thumbnail`,
+      photo,
     };
   }
 

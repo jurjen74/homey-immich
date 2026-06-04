@@ -17,6 +17,23 @@
       "type": "number",
       "title": { "en": "Total assets", "nl": "Totaal bestanden" },
       "example": 42
+    },
+    {
+      "name": "asset_id",
+      "type": "string",
+      "title": { "en": "Asset ID", "nl": "Asset-ID" },
+      "example": { "en": "a1b2c3d4-0000-0000-0000-000000000000", "nl": "a1b2c3d4-0000-0000-0000-000000000000" }
+    },
+    {
+      "name": "filename",
+      "type": "string",
+      "title": { "en": "Filename", "nl": "Bestandsnaam" },
+      "example": { "en": "IMG_1234.jpg", "nl": "IMG_1234.jpg" }
+    },
+    {
+      "name": "photo",
+      "type": "image",
+      "title": { "en": "Photo", "nl": "Foto" }
     }
   ],
   "args": [

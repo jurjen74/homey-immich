@@ -16,6 +16,11 @@
       "type": "number",
       "title": { "en": "Photos", "nl": "Foto's" },
       "example": 5
+    },
+    {
+      "name": "photo",
+      "type": "image",
+      "title": { "en": "Photo", "nl": "Foto" }
     }
   ],
   "args": [

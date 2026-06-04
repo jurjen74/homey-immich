@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "net.ladenius.immich",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "compatibility": ">=12.4.0",
   "sdk": 3,
   "runtime": "nodejs",
@@ -64,6 +64,38 @@
               "nl": "Totaal bestanden"
             },
             "example": 42
+          },
+          {
+            "name": "asset_id",
+            "type": "string",
+            "title": {
+              "en": "Asset ID",
+              "nl": "Asset-ID"
+            },
+            "example": {
+              "en": "a1b2c3d4-0000-0000-0000-000000000000",
+              "nl": "a1b2c3d4-0000-0000-0000-000000000000"
+            }
+          },
+          {
+            "name": "filename",
+            "type": "string",
+            "title": {
+              "en": "Filename",
+              "nl": "Bestandsnaam"
+            },
+            "example": {
+              "en": "IMG_1234.jpg",
+              "nl": "IMG_1234.jpg"
+            }
+          },
+          {
+            "name": "photo",
+            "type": "image",
+            "title": {
+              "en": "Photo",
+              "nl": "Foto"
+            }
           }
         ],
         "args": [
@@ -195,6 +227,14 @@
               "en": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail",
               "nl": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail"
             }
+          },
+          {
+            "name": "photo",
+            "type": "image",
+            "title": {
+              "en": "Photo",
+              "nl": "Foto"
+            }
           }
         ],
         "args": [
@@ -237,12 +277,12 @@
       },
       {
         "title": {
-          "en": "An \"On This Day\" memory is available",
-          "nl": "Er is een \"Op deze dag\" herinnering beschikbaar"
+          "en": "An \"On This Day\" memory year is available",
+          "nl": "Er is een \"Op deze dag\" herinneringsjaar beschikbaar"
         },
         "hint": {
-          "en": "Triggers once per day when Immich has On This Day memories for today.",
-          "nl": "Activeert eenmaal per dag wanneer Immich herinneringen heeft voor vandaag."
+          "en": "Fires once per memory year on the first poll of the day (e.g. once for 2022 and again for 2019).",
+          "nl": "Activeert eenmaal per herinneringsjaar bij de eerste controle van de dag (bijv. eenmaal voor 2022 en nogmaals voor 2019)."
         },
         "tokens": [
           {
@@ -262,6 +302,14 @@
               "nl": "Foto's"
             },
             "example": 5
+          },
+          {
+            "name": "photo",
+            "type": "image",
+            "title": {
+              "en": "Photo",
+              "nl": "Foto"
+            }
           }
         ],
         "args": [
@@ -321,6 +369,14 @@
             "example": {
               "en": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail",
               "nl": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail"
+            }
+          },
+          {
+            "name": "photo",
+            "type": "image",
+            "title": {
+              "en": "Photo",
+              "nl": "Foto"
             }
           }
         ],
@@ -701,6 +757,14 @@
             "example": {
               "en": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail",
               "nl": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail"
+            }
+          },
+          {
+            "name": "photo",
+            "type": "image",
+            "title": {
+              "en": "Photo",
+              "nl": "Foto"
             }
           }
         ],

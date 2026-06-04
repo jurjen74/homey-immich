@@ -38,6 +38,11 @@
       "type": "string",
       "title": { "en": "Thumbnail URL", "nl": "Miniatuur-URL" },
       "example": { "en": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail", "nl": "http://192.168.1.100:2283/api/assets/a1b2c3d4/thumbnail" }
+    },
+    {
+      "name": "photo",
+      "type": "image",
+      "title": { "en": "Photo", "nl": "Foto" }
     }
   ]
 }
