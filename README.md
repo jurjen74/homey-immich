@@ -21,17 +21,17 @@ Multiple Immich instances are supported by adding more than one device.
 
 ## Triggers
 
-**A photo or video was uploaded** — fires for every new asset that appears in Immich since the last poll. Provides tokens for asset ID, type, filename, date taken, and a thumbnail URL.
+**A photo or video was uploaded** — fires for every new asset that appears in Immich since the last poll. Provides tokens for asset ID, type, filename, date taken, thumbnail URL, and a **Photo image token** you can drop into Homey Gallery, push notifications, or any flow card that accepts an image.
 
-**A person appeared in a new photo** — fires for each recognised person in a newly uploaded asset. You configure which person to watch using an autocomplete picker. Provides tokens for the person's name, asset ID, and thumbnail URL.
+**A person appeared in a new photo** — fires for each recognised person in a newly uploaded asset. You configure which person to watch using an autocomplete picker. Provides tokens for the person's name, asset ID, thumbnail URL, and a Photo image token.
 
-**An album received a new asset** — fires when the asset count of a chosen album increases. Provides tokens for the album name and new total count.
+**An album received a new asset** — fires once per newly added asset when an album you've chosen gains assets. Detection is set-diff based, so it works whether you uploaded a fresh photo or added an existing one. Provides tokens for the album name, new total count, the new asset's ID, filename, and a Photo image token.
 
 **New duplicates were found** — fires when Immich detects more duplicate groups than the previous poll. Provides a token with the current number of duplicate groups.
 
-**Today's memory** — fires once per day for each memory Immich has for today's date. Provides tokens for the year the memory is from and the number of assets in it.
+**An "On This Day" memory year is available** — fires once per memory year on the first poll of the day (e.g. once for 2022 and again for 2019). Provides tokens for the year, the number of photos in that year's memory, and a Photo image token of the first asset.
 
-**Disk space is getting low** — fires once when free disk space drops below a threshold you set, and resets when space rises back above it. Provides a token with the current free space in GB.
+**Disk space dropped below a threshold** — fires once when free disk space drops below a threshold you set, and resets when space rises back above it. Provides a token with the current free space in GB.
 
 ## Conditions
 
@@ -43,7 +43,7 @@ Multiple Immich instances are supported by adding more than one device.
 
 ## Actions
 
-**Get a random photo** — fetches a random asset from Immich and provides its asset ID, type, filename, date taken, and thumbnail URL as flow tokens for use in subsequent cards.
+**Get a random photo** — fetches a random asset from Immich and provides its asset ID, type, filename, date taken, thumbnail URL, and a Photo image token for use in subsequent cards.
 
 **Add to album / Remove from album** — moves an asset into or out of an album. The album is selected from an autocomplete list of your albums.
 
@@ -77,9 +77,11 @@ All values update on each poll and are available in Homey Insights.
 
 ## Dashboard widget
 
-The **Immich Photo** widget displays a photo from your Immich library on the Homey Pro dashboard. Configure it by tapping the widget settings:
+The **Immich Photo** widget displays a photo from your Immich library on the Homey Pro dashboard. The Immich device is selected when you add the widget; each widget instance binds to one device, so multiple Immich servers and multiple widgets each pointing at a different album are all supported. Configure the widget by tapping its settings:
 
-- **Device** — which Immich device to pull photos from
+- **Widget shape** — square, landscape, wide, portrait, or tall (drives the tile's aspect ratio via dynamic height)
+- **Photo fit** — fill (crop edges) or fit (show whole photo with letterboxing)
+- **Album** — autocomplete picker. Choose *All photos* to use the whole library or pick a specific album to restrict the widget to it
 - **Photo source** — random photo, latest upload, or today's memory
 - **Refresh interval** — how often to load a new photo (10–3600 seconds)
 - **Show filename and date** — toggle the metadata overlay at the bottom of the photo
