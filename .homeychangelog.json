@@ -4,5 +4,8 @@
   },
   "1.0.1": {
     "en": "Widget fixes"
+  },
+  "1.0.7": {
+    "en": "Added image token for use in other widgets and flows"
   }
 }

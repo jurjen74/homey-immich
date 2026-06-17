@@ -42,7 +42,7 @@ module.exports = class ImmichApp extends Homey.App {
     }
 
     const q = (query || '').toLowerCase();
-    return results.filter(r => r.name.toLowerCase().includes(q));
+    return results.filter((r) => r.name.toLowerCase().includes(q));
   }
 
 };

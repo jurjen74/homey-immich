@@ -28,7 +28,7 @@ class ImmichDevice extends Homey.Device {
   _startPolling(intervalSeconds) {
     const secs = intervalSeconds ?? this.getSetting('poll_interval') ?? 60;
     this._pollTimer = this.homey.setInterval(() => this._poll(), secs * 1000);
-    this._poll();
+    this._poll().catch((err) => this.error(err));
   }
 
   _stopPolling() {
@@ -123,8 +123,7 @@ class ImmichDevice extends Homey.Device {
             ).catch(this.error.bind(this));
           }
         } else if (prev === undefined && curr > 0) {
-          this._baselineAlbumAssetIds(album.id).catch((err) =>
-            this.log(`Album baseline failed for "${album.albumName}": ${err.message}`));
+          this._baselineAlbumAssetIds(album.id).catch((err) => this.log(`Album baseline failed for "${album.albumName}": ${err.message}`));
         }
         this._albumAssetCounts[album.id] = curr;
       }
@@ -171,7 +170,7 @@ class ImmichDevice extends Homey.Device {
       if (items.length === 0) break;
 
       for (const asset of items) {
-        const thumb_url = `${baseUrl}/api/assets/${asset.id}/thumbnail`;
+        const thumbUrl = `${baseUrl}/api/assets/${asset.id}/thumbnail`;
         const photo = await this._createAssetImage(asset.id).catch(() => null);
 
         this.driver.triggerNewAsset(this, {
@@ -179,7 +178,7 @@ class ImmichDevice extends Homey.Device {
           type: asset.type ?? 'IMAGE',
           filename: asset.originalFileName ?? '',
           taken_at: asset.fileCreatedAt ?? '',
-          thumb_url,
+          thumb_url: thumbUrl,
           photo,
         }).catch(this.error.bind(this));
 
@@ -187,7 +186,9 @@ class ImmichDevice extends Homey.Device {
           if (!person.id || !person.name) continue;
           this.driver.triggerPersonInNewPhoto(
             this,
-            { person_name: person.name, asset_id: asset.id, thumb_url, photo },
+            {
+              person_name: person.name, asset_id: asset.id, thumb_url: thumbUrl, photo,
+            },
             { personId: person.id },
           ).catch(this.error.bind(this));
         }
@@ -237,7 +238,9 @@ class ImmichDevice extends Homey.Device {
       const res = await this._api.getThumbnailStream(assetId);
       return res.pipe(stream);
     });
-    setTimeout(() => image.unregister().catch(() => {}), 10 * 60 * 1000);
+    this.homey.setTimeout(() => {
+      image.unregister().catch(() => {});
+    }, 10 * 60 * 1000);
     return image;
   }
 
@@ -247,24 +250,22 @@ class ImmichDevice extends Homey.Device {
     if (!assets.length) return [];
 
     const knownIds = this._albumAssetIds[albumId];
-    this._albumAssetIds[albumId] = new Set(assets.map(a => a.id));
+    this._albumAssetIds[albumId] = new Set(assets.map((a) => a.id));
 
     if (knownIds) {
       return assets
-        .filter(a => !knownIds.has(a.id))
-        .sort((a, b) =>
-          new Date(a.createdAt ?? 0) - new Date(b.createdAt ?? 0));
+        .filter((a) => !knownIds.has(a.id))
+        .sort((a, b) => new Date(a.createdAt ?? 0) - new Date(b.createdAt ?? 0));
     }
 
-    const newest = assets.slice().sort((a, b) =>
-      new Date(b.createdAt ?? b.updatedAt ?? 0) - new Date(a.createdAt ?? a.updatedAt ?? 0))[0];
+    const newest = assets.slice().sort((a, b) => new Date(b.createdAt ?? b.updatedAt ?? 0) - new Date(a.createdAt ?? a.updatedAt ?? 0))[0];
     return newest ? [newest] : [];
   }
 
   async _baselineAlbumAssetIds(albumId) {
     const album = await this._api.getAlbum(albumId);
     if (album?.assets) {
-      this._albumAssetIds[albumId] = new Set(album.assets.map(a => a.id));
+      this._albumAssetIds[albumId] = new Set(album.assets.map((a) => a.id));
     }
   }
 

@@ -11,9 +11,7 @@ class ImmichDriver extends Homey.Driver {
 
     this._triggerDiskSpaceLow = this.homey.flow.getDeviceTriggerCard('disk_space_low');
     this._triggerDiskSpaceLow
-      .registerRunListener((args, state) =>
-        state.diskFreeGb < args.threshold && state.prevDiskFreeGb >= args.threshold,
-      );
+      .registerRunListener((args, state) => state.diskFreeGb < args.threshold && state.prevDiskFreeGb >= args.threshold);
 
     this.homey.flow.getConditionCard('disk_space_below')
       .registerRunListener((args) => {
@@ -31,8 +29,8 @@ class ImmichDriver extends Homey.Driver {
         if (!api) return [];
         const people = await api.getAllPeople().catch(() => []);
         return people
-          .filter(p => p.name && p.name.toLowerCase().includes(query.toLowerCase()))
-          .map(p => ({ id: p.id, name: p.name }));
+          .filter((p) => p.name && p.name.toLowerCase().includes(query.toLowerCase()))
+          .map((p) => ({ id: p.id, name: p.name }));
       });
 
     this._triggerAlbumGotNewAsset = this.homey.flow.getDeviceTriggerCard('album_got_new_asset');
@@ -45,8 +43,8 @@ class ImmichDriver extends Homey.Driver {
         if (!api) return [];
         const albums = await api.getAlbums().catch(() => []);
         return (Array.isArray(albums) ? albums : [])
-          .filter(a => (a.albumName ?? '').toLowerCase().includes(query.toLowerCase()))
-          .map(a => ({ id: a.id, name: a.albumName }));
+          .filter((a) => (a.albumName ?? '').toLowerCase().includes(query.toLowerCase()))
+          .map((a) => ({ id: a.id, name: a.albumName }));
       });
 
     this._triggerNewDuplicate = this.homey.flow.getDeviceTriggerCard('new_duplicate');
@@ -59,8 +57,8 @@ class ImmichDriver extends Homey.Driver {
         if (!api) return [];
         const albums = await api.getAlbums().catch(() => []);
         return (Array.isArray(albums) ? albums : [])
-          .filter(a => (a.albumName ?? '').toLowerCase().includes(query.toLowerCase()))
-          .map(a => ({ id: a.id, name: a.albumName }));
+          .filter((a) => (a.albumName ?? '').toLowerCase().includes(query.toLowerCase()))
+          .map((a) => ({ id: a.id, name: a.albumName }));
       });
 
     const removeFromAlbumCard = this.homey.flow.getActionCard('remove_from_album');
@@ -71,8 +69,8 @@ class ImmichDriver extends Homey.Driver {
         if (!api) return [];
         const albums = await api.getAlbums().catch(() => []);
         return (Array.isArray(albums) ? albums : [])
-          .filter(a => (a.albumName ?? '').toLowerCase().includes(query.toLowerCase()))
-          .map(a => ({ id: a.id, name: a.albumName }));
+          .filter((a) => (a.albumName ?? '').toLowerCase().includes(query.toLowerCase()))
+          .map((a) => ({ id: a.id, name: a.albumName }));
       });
 
     const shareAlbumCard = this.homey.flow.getActionCard('share_album');
@@ -83,8 +81,8 @@ class ImmichDriver extends Homey.Driver {
         if (!api) return [];
         const albums = await api.getAlbums().catch(() => []);
         return (Array.isArray(albums) ? albums : [])
-          .filter(a => (a.albumName ?? '').toLowerCase().includes(query.toLowerCase()))
-          .map(a => ({ id: a.id, name: a.albumName }));
+          .filter((a) => (a.albumName ?? '').toLowerCase().includes(query.toLowerCase()))
+          .map((a) => ({ id: a.id, name: a.albumName }));
       });
 
     this.homey.flow.getConditionCard('new_uploads_today')
@@ -158,7 +156,13 @@ class ImmichDriver extends Homey.Driver {
 
     session.setHandler('list_devices', () => {
       const { url, apiKey } = pairData;
-      const hostname = (() => { try { return new URL(url).hostname; } catch { return url; } })();
+      const hostname = (() => {
+        try {
+          return new URL(url).hostname;
+        } catch {
+          return url;
+        }
+      })();
       return [
         {
           name: `Immich (${hostname})`,

@@ -9,7 +9,7 @@ module.exports = {
     if (!deviceId) throw new Error('No device');
 
     const driver = homey.drivers.getDriver('immich');
-    const device = driver.getDevices().find(d => d.getId() === deviceId);
+    const device = driver.getDevices().find((d) => d.getId() === deviceId);
     if (!device) throw new Error('Device not found');
 
     const useAlbum = albumId && albumId !== ALL_PHOTOS_ID;
