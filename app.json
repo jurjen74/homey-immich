@@ -12,7 +12,7 @@
     "en": "Immich"
   },
   "description": {
-    "en": "React to changes in and/or control Immich"
+    "en": "Bring your self-hosted photo library to life with Homey"
   },
   "category": [
     "internet"
@@ -27,6 +27,19 @@
   "author": {
     "name": "Jurjen Ladenius",
     "email": "jurjen@ladenius.net"
+  },
+  "support": "https://github.com/jurjen74/homey-immich/issues",
+  "bugs": {
+    "url": "https://github.com/jurjen74/homey-immich/issues"
+  },
+  "source": "https://github.com/jurjen74/homey-immich",
+  "homeyCommunityTopicId": 156351,
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "aessedai@ladenius.net"
+      }
+    }
   },
   "flow": {
     "triggers": [

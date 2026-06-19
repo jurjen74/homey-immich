@@ -1,1 +1,3 @@
-React to changes in and/or control Immich
+Immich connects Homey to your own self-hosted Immich photo server, so the moments you capture can become part of your smart home. After a quick, secure pairing with your server URL and a personal API key, the app keeps an eye on your library and lets your flows react the instant something happens: a new photo is uploaded, a memory resurfaces, a recognized person appears, an album gains a new asset, a duplicate is found, or disk space runs low.
+
+Beyond reacting to changes, you can put Immich to work from your flows: add or remove photos from albums, create albums and shareable links, favorite, archive or describe assets, trigger server jobs, and pull a random photo into a flow. A dashboard widget can also display a random image from your whole library or a chosen album, turning any Homey dashboard into a living photo frame.
