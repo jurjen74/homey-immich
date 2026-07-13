@@ -245,8 +245,7 @@ class ImmichDevice extends Homey.Device {
   }
 
   async _getNewlyAddedAlbumAssets(albumId) {
-    const album = await this._api.getAlbum(albumId);
-    const assets = album?.assets ?? [];
+    const assets = await this._api.getAlbumAssets(albumId);
     if (!assets.length) return [];
 
     const knownIds = this._albumAssetIds[albumId];
@@ -263,10 +262,8 @@ class ImmichDevice extends Homey.Device {
   }
 
   async _baselineAlbumAssetIds(albumId) {
-    const album = await this._api.getAlbum(albumId);
-    if (album?.assets) {
-      this._albumAssetIds[albumId] = new Set(album.assets.map((a) => a.id));
-    }
+    const assets = await this._api.getAlbumAssets(albumId);
+    this._albumAssetIds[albumId] = new Set(assets.map((a) => a.id));
   }
 
   // ── Flow targets ──────────────────────────────────────────────────────────
@@ -337,11 +334,11 @@ class ImmichDevice extends Homey.Device {
   }
 
   async cmdArchiveAsset(assetId) {
-    await this._api.updateAssets([assetId], { isArchived: true });
+    await this._api.updateAssets([assetId], { visibility: 'archive' });
   }
 
   async cmdUnarchiveAsset(assetId) {
-    await this._api.updateAssets([assetId], { isArchived: false });
+    await this._api.updateAssets([assetId], { visibility: 'timeline' });
   }
 
   async cmdSetDescription(assetId, description) {

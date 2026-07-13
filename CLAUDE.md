@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A Homey smart home app (SDK v3) that integrates Immich, the self-hosted photo management platform. App ID: `net.ladenius.immich`. Minimum supported Immich version: 2.7.5.
+A Homey smart home app (SDK v3) that integrates Immich, the self-hosted photo management platform. App ID: `net.ladenius.immich`. Supported Immich versions: 2.7.5 through 3.x. The API client targets endpoints present across that whole range (e.g. `POST /search/random` rather than the v3-removed `GET /assets/random`; `PUT /assets/{id}` for single-asset updates), so no version-detection logic is needed.
 
 ## Commands
 

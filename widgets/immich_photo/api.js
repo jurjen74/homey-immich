@@ -23,8 +23,7 @@ module.exports = {
         assetInfo = assets[Math.floor(Math.random() * assets.length)];
       }
     } else if (useAlbum) {
-      const album = await device._api.getAlbum(albumId);
-      const assets = album?.assets ?? [];
+      const assets = await device._api.getAlbumAssets(albumId);
       if (assets.length) {
         if (mode === 'latest') {
           assetInfo = assets

@@ -5,7 +5,7 @@ Connects [Immich](https://immich.app) — the self-hosted photo and video manage
 ## Requirements
 
 - Homey Pro (2023 or later) for the dashboard widget
-- Immich v2.7.5 or later
+- Immich v2.7.5 or later (including v3.x)
 - An Immich API key (generate one in Immich → Account Settings → API Keys)
 
 ## Setup

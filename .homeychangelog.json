@@ -13,5 +13,8 @@
   },
   "1.0.9": {
     "en": "Updated descriptions and added support links"
+  },
+  "1.0.10": {
+    "en": "Added Immich v3 support and fixed the random photo, album, archive, set description and trash count features"
   }
 }
