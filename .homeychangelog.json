@@ -31,5 +31,8 @@
   },
   "1.0.15": {
     "en": "Protected against memory overflow and reduced duplicates size"
+  },
+  "1.0.16": {
+    "en": "Maintenance updates and less padding in widget."
   }
 }
